@@ -36,8 +36,8 @@ site:
 #  - name: advanced-cluster-management
 #    namespace: open-cluster-management
 #    source: redhat-operators
-#    channel: release-2.4
-#    csv: v2.4.0
+#    channel: release-2.3
+#    csv: v2.3.2
 #
 #  projects:
 #  - datacenter

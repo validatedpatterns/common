@@ -26,8 +26,8 @@ site:
   subscriptions:
   - name: advanced-cluster-management
     namespace: open-cluster-management
-    channel: release-2.4
-    csv: advanced-cluster-management.v2.4.0
+    channel: release-2.3
+    csv: advanced-cluster-management.v2.3.2
 
   - name: seldon-operator
     namespace: manuela-ml-workspace
