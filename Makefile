@@ -37,6 +37,11 @@ init:
 	git submodule update --init --recursive
 
 deploy:
+# Protect ourselves from the mistake of having origin point at https:///github.com/..., origin must point to our own clone
+ifeq ($(findstring https///,$(TARGET_REPO)),https///)
+	@echo "ERROR origin points to wrong repo $(TARGET_REPO)"
+	exit 1
+endif
 	helm install $(NAME) common/install/ $(HELM_OPTS)
 
 upgrade:
