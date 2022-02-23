@@ -22,7 +22,7 @@ if [ "$rc" = 0 ]; then
     rm -f "${OUTPUT}"
 fi
 
-if [ "$TEST_VARIANT" = normal -a "$rc" = 0 ]; then
+if [ "$TEST_VARIANT" = normal ] && [ "$rc" = 0 ]; then
     # Another method of finding variables missing from values.yaml, eg.
     # -    name: -datacenter
     # +    name: pattern-name-datacenter
