@@ -1,4 +1,6 @@
 #!/bin/sh
+# shellcheck disable=SC2181
+# SC2181 (style): Check exit code directly with e.g. 'if mycmd;', not indirectly with $?
 
 #This script must receive arguments for the following parameters; it is easiest to pass them as environment variables from the command line.
 #Example values from the first use for it, in industrial-edge
