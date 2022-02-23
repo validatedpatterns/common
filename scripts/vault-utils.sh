@@ -18,7 +18,7 @@ vault_ready_check()
 
 get_vault_ready()
 {
-	rdy_output=`vault_ready_check`
+	rdy_output=$(vault_ready_check)
 
 	# Things we may have to wait for:
 	#   being assigned to a host
@@ -27,7 +27,7 @@ get_vault_ready()
 		until [ "$rdy_output" ]
 		do
 			sleep 5
-			rdy_output=`vault_ready_check`
+			rdy_output=$(vault_ready_check)
 		done
 	fi
 
@@ -44,9 +44,9 @@ vault_unseal()
 		file=common/vault.init
 	fi
 
-	for unseal in `cat $file | grep "Unseal Key" | awk '{ print $4 }'`
+	for unseal in $(grep "Unseal Key" "$file" | awk '{ print $4 }')
 	do
-		oc -n vault exec vault-0 -- vault operator unseal $unseal
+		oc -n vault exec vault-0 -- vault operator unseal "$unseal"
 	done
 
 	vault_login $file
@@ -68,7 +68,7 @@ vault_init()
 	fi
 
 	# The vault is ready to be initialized when it is "Running" but not "ready".  Unsealing it makes it ready
-	rdy_check=`get_vault_ready`
+	rdy_check=$(get_vault_ready)
 
 	if [ "$rdy_check" = "1/1 Running" ]; then
 		echo "Vault is already ready, exiting"
@@ -77,8 +77,8 @@ vault_init()
 
 	until [ "$rdy_check" = "0/1 Running" ]
 	do
-		echo $rdy_check
-		rdy_check=`get_vault_ready`
+		echo "$rdy_check"
+		rdy_check=$(get_vault_ready)
 	done
 
 	oc -n vault exec vault-0 -- vault operator init | tee $file
@@ -106,7 +106,7 @@ vault_get_root_token()
 		file=common/vault.init
 	fi
 
-	token=`grep "Initial Root Token" $file | awk '{ print $4 }'`
+	token=$(grep "Initial Root Token" "$file" | awk '{ print $4 }')
 	printf "%s" "$token"
 }
 
@@ -115,19 +115,19 @@ vault_get_root_token()
 vault_token_exec()
 {
 	file="$1"
-	token=`vault_get_root_token $file`
+	token=$(vault_get_root_token "$file")
 	shift
-	cmd="$@"
+	cmd="$*"
 
-	vault_exec $file "VAULT_TOKEN=$token $cmd"
+	vault_exec "$file" "VAULT_TOKEN=$token $cmd"
 }
 
 vault_exec()
 {
 	file="$1"
-	token=`vault_get_root_token $file`
+	token=$(vault_get_root_token "$file")
 	shift
-	cmd="$@"
+	cmd="$*"
 
 	oc -n vault exec -i vault-0 -- sh -c "$cmd"
 }
@@ -135,27 +135,27 @@ vault_exec()
 vault_login()
 {
 	file="$1"
-	token=`vault_get_root_token $file`
+	token=$(vault_get_root_token "$file")
 	shift
-	cmd="$@"
+	cmd="$*"
 
-	vault_exec $file "vault login $token"
+	vault_exec "$file" "vault login $token"
 }
 
 oc_get_domain()
 {
-	oc get ingresses.config/cluster -o jsonpath={.spec.domain}
+	oc get ingresses.config/cluster -o jsonpath='{.spec.domain}'
 }
 
 oc_get_pki_domain()
 {
-	printf "%s" `oc_get_domain | cut -d. -f3-`
+	printf "%s" "$(oc_get_domain | cut -d. -f3-)"
 }
 
 oc_get_pki_role()
 {
-	pkidomain=`oc_get_pki_domain`
-	certrole=`printf "%s" "$pkidomain" | sed 's|\.|_|g'`
+	pkidomain=$(oc_get_pki_domain)
+	certrole=$(printf "%s" "$pkidomain" | sed 's|\.|_|g')
 	printf "%s" "$certrole"
 }
 
@@ -163,21 +163,21 @@ vault_pki_init()
 {
 	file="$1"
 
-	pkidomain=`oc_get_pki_domain`
-	pkirole=`oc_get_pki_role`
+	pkidomain=$(oc_get_pki_domain)
+	pkirole=$(oc_get_pki_role)
 
-	vault_exec $file "vault secrets enable pki"
-	vault_exec $file "vault secrets tune --max-lease-ttl=8760h pki"
-	vault_exec $file "vault write pki/root/generate/internal common_name=$pkidomain ttl=8760h"
-	vault_exec $file 'vault write pki/config/urls issuing_certificates="http://127.0.0.1:8200/v1/pki/ca" crl_distribution_points="http://127.0.0.1:8200/v1/pki/crl"'
-	vault_exec $file "vault write pki/roles/$pkirole allowed_domains=$pkidomain allow_subdomains=true max_ttl=8760h"
+	vault_exec "$file" "vault secrets enable pki"
+	vault_exec "$file" "vault secrets tune --max-lease-ttl=8760h pki"
+	vault_exec "$file" "vault write pki/root/generate/internal common_name=$pkidomain ttl=8760h"
+	vault_exec "$file" 'vault write pki/config/urls issuing_certificates="http://127.0.0.1:8200/v1/pki/ca" crl_distribution_points="http://127.0.0.1:8200/v1/pki/crl"'
+	vault_exec "$file" "vault write pki/roles/$pkirole allowed_domains=$pkidomain allow_subdomains=true max_ttl=8760h"
 }
 
 vault_kubernetes_init()
 {
 	file="$1"
 
-	vault_exec $file "vault auth enable --path=hub kubernetes"
+	vault_exec "$file" "vault auth enable --path=hub kubernetes"
 }
 
 vault_policy_init()
@@ -186,23 +186,23 @@ vault_policy_init()
 
 	k8s_host='https://$KUBERNETES_PORT_443_TCP_ADDR:443'
 	secret_name="$(oc get -n golang-external-secrets serviceaccount golang-external-secrets -o jsonpath='{.secrets}' | jq -r '.[] | select(.name | test ("golang-external-secrets-token-")).name')"
-	sa_token="$(oc get secret -n golang-external-secrets ${secret_name} -o go-template='{{ .data.token | base64decode }}')"
+	sa_token="$(oc get secret -n golang-external-secrets "${secret_name}" -o go-template='{{ .data.token | base64decode }}')"
 
-	vault_exec $file "vault write auth/hub/config token_reviewer_jwt=$sa_token kubernetes_host=$k8s_host kubernetes_ca_cert=@/var/run/secrets/kubernetes.io/serviceaccount/ca.crt issuer=https://kubernetes.default.svc"
-	vault_exec $file 'vault policy write hub-secret - << EOF
+	vault_exec "$file" "vault write auth/hub/config token_reviewer_jwt=$sa_token kubernetes_host=$k8s_host kubernetes_ca_cert=@/var/run/secrets/kubernetes.io/serviceaccount/ca.crt issuer=https://kubernetes.default.svc"
+	vault_exec "$file" 'vault policy write hub-secret - << EOF
 path "secret/data/hub/*"
   { capabilities = ["create", "read", "update", "delete", "list"]
 }
 EOF
 '
-	vault_exec $file 'vault write auth/hub/role/hub-role bound_service_account_names="golang-external-secrets" bound_service_account_namespaces="golang-external-secrets" policies="default,hub-secret" ttl="15m"'
+	vault_exec "$file" 'vault write auth/hub/role/hub-role bound_service_account_names="golang-external-secrets" bound_service_account_namespaces="golang-external-secrets" policies="default,hub-secret" ttl="15m"'
 }
 
 vault_secrets_init()
 {
 	file="$1"
 
-	vault_exec $file "vault secrets enable -path=secret kv-v2"
+	vault_exec "$file" "vault secrets enable -path=secret kv-v2"
 }
 
 vault_create_secret()
@@ -211,9 +211,9 @@ vault_create_secret()
 	shift
 	secret_path="$1"
 	shift
-	secret="$@"
+	secret="$*"
 
-	vault_exec $file "vault kv put $secret_path $secret"
+	vault_exec "$file" "vault kv put $secret_path $secret"
 }
 
-$@
+"$@"
