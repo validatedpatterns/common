@@ -184,6 +184,7 @@ vault_policy_init()
 {
 	file="$1"
 
+	# shellcheck disable=SC2016
 	k8s_host='https://$KUBERNETES_PORT_443_TCP_ADDR:443'
 	secret_name="$(oc get -n golang-external-secrets serviceaccount golang-external-secrets -o jsonpath='{.secrets}' | jq -r '.[] | select(.name | test ("golang-external-secrets-token-")).name')"
 	sa_token="$(oc get secret -n golang-external-secrets "${secret_name}" -o go-template='{{ .data.token | base64decode }}')"
