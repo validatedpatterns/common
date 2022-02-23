@@ -1,6 +1,6 @@
 #!/bin/bash -x
 
-BASE=$(dirname $0)
+BASE=$(dirname "$0")
 if [ "$BASE" = "$PWD" ]; then
     BASE=./
 fi
