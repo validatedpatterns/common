@@ -1,4 +1,7 @@
 #!/bin/sh
+# shellcheck disable=SC2181,SC3037
+# SC2181 (style): Check exit code directly with e.g. 'if mycmd;', not indirectly with $?
+# SC3037 (warning): In POSIX sh, echo flags are undefined.
 
 #This script is written to be POSIX-compliant, as not all sh are created equal - many are bash but
 #Debian-derivatives use dash which doesn't support some bash syntax
@@ -9,30 +12,23 @@ TARGET_NAMESPACE="external-secrets-deployable"
 token_resource="vault"
 src_ns="vault"
 
-ns=0
-ok=0
-
 # Check for Namespaces and Secrets to be ready (it takes the cluster a few minutes to deploy them)
-while [ 1 ] ; do
+while true; do
 	echo -n "Checking for namespace $TARGET_NAMESPACE to exist..."
-	if [ oc get namespace $TARGET_NAMESPACE >/dev/null 2>/dev/null ]; then
+	if oc get namespace $TARGET_NAMESPACE >/dev/null 2>/dev/null; then
 		echo "not yet"
-		ns=0
 		sleep 2
 		continue
 	else
 		echo "OK"
-		ns=1
 	fi
 
 	echo -n "Checking for $token_resource to be populated in $src_ns..."
-	tok=`oc sa get-token -n $src_ns $token_resource 2>/dev/null`
+	tok=$(oc sa get-token -n $src_ns $token_resource 2>/dev/null)
 	if [ "$?" = 0 ] && [ -n "$tok" ]; then
 		echo "OK"
-		ok=1
 	else
 		echo "not yet"
-		ok=0
 		sleep 2
 		continue
 	fi
@@ -41,7 +37,7 @@ while [ 1 ] ; do
 	break
 done
 
-TOKEN=$(echo $tok | base64 -w 0)
+TOKEN=$(echo "$tok" | base64 -w 0)
 cat << HERE | oc apply -f-
 apiVersion: apps.open-cluster-management.io/v1
 kind: Deployable
