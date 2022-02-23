@@ -16,30 +16,23 @@
 passwd_resource="secrets/${COMPONENT}-gitops-cluster"
 src_ns="${PATTERN}-${COMPONENT}"
 
-ns=0
-gitops=0
-
 # Check for Namespaces and Secrets to be ready (it takes the cluster a few minutes to deploy them)
 while true; do
 	echo -n "Checking for namespace $TARGET_NAMESPACE to exist..."
 	if oc get namespace "$TARGET_NAMESPACE" >/dev/null 2>/dev/null; then
 		echo "not yet"
-		ns=0
 		sleep 2
 		continue
 	else
 		echo "OK"
-		ns=1
 	fi
 
 	echo -n "Checking for $passwd_resource to be populated in $src_ns..."
 	pw=$(oc -n "$src_ns" extract "$passwd_resource" --to=- 2>/dev/null)
 	if [ "$?" = 0 ] && [ -n "$pw" ]; then
 		echo "OK"
-		gitops=1
 	else
 		echo "not yet"
-		gitops=0
 		sleep 2
 		continue
 	fi
