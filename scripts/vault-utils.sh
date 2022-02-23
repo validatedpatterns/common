@@ -44,7 +44,7 @@ vault_unseal()
 		file=common/vault.init
 	fi
 
-	for unseal in $(grep "Unseal Key" "$file" | awk '{ print $4 }')
+	grep "Unseal Key" < "$file" | awk '{ print $4 }' | while IFS= read -r unseal
 	do
 		oc -n vault exec vault-0 -- vault operator unseal "$unseal"
 	done
