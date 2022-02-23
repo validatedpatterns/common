@@ -42,6 +42,6 @@ while true; do
 done
 
 user=$(echo admin | base64)
-password=$(echo $pw | base64)
+password=$(echo "$pw" | base64)
 
 echo "{ \"apiVersion\": \"v1\", \"kind\": \"Secret\", \"metadata\": { \"name\": \"$SECRET_NAME\", \"namespace\": \"$TARGET_NAMESPACE\" }, \"data\": { \"ARGOCD_PASSWORD\": \"$password\", \"ARGOCD_USERNAME\": \"$user\" }, \"type\": \"Opaque\" }" | oc apply -f-
