@@ -19,8 +19,8 @@ spec:
     helm:
       ignoreMissingValueFiles: true
       valueFiles:
-      - "{{ coalesce .Values.main.git.valuesDirectoryURL $valuesDirectoryURLFixed }}/values-global.yaml"
-      - "{{ coalesce .Values.main.git.valuesDirectoryURL $valuesDirectoryURLFixed }}/values-{{ .Values.main.clusterGroupName }}.yaml"
+      - "{{ default "" .Values.main.git.valuesDirectoryURL }}/values-global.yaml"
+      - "{{ default "" .Values.main.git.valuesDirectoryURL }}/values-{{ .Values.main.clusterGroupName }}.yaml"
       # Track the progress of https://github.com/argoproj/argo-cd/pull/6280
       parameters:
         - name: global.repoURL

@@ -41,8 +41,8 @@ spec:
                     helm:
                       ignoreMissingValueFiles: true
                       valueFiles:
-                      - "{{ coalesce .valuesDirectoryURL $.Values.global.valuesDirectoryURL }}/values-global.yaml"
-                      - "{{ coalesce .valuesDirectoryURL $.Values.global.valuesDirectoryURL }}/values-{{ .name }}.yaml"
+                      - "{{ default "" .valuesDirectoryURL }}/values-global.yaml"
+                      - "{{ default "" .valuesDirectoryURL }}/values-{{ .name }}.yaml"
                       parameters:
                       - name: global.repoURL
                         value: $ARGOCD_APP_SOURCE_REPO_URL
@@ -53,7 +53,7 @@ spec:
                       - name: global.pattern
                         value: {{ $.Values.global.pattern }}
                       - name: global.valuesDirectoryURL
-                        value: {{ coalesce .valuesDirectoryURL $.Values.global.valuesDirectoryURL }}
+                        value: {{ default "" .valuesDirectoryURL }}
                       - name: global.hubClusterDomain
                         value: {{ $.Values.global.hubClusterDomain }}
                       - name: global.localClusterDomain

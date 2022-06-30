@@ -456,8 +456,8 @@ spec:
     helm:
       ignoreMissingValueFiles: true
       valueFiles:
-      - "https://github.com/pattern-clone/mypattern/raw/main/values-global.yaml"
-      - "https://github.com/pattern-clone/mypattern/raw/main/values-example.yaml"
+      - "/values-global.yaml"
+      - "/values-example.yaml"
       # Watch the progress of https://issues.redhat.com/browse/GITOPS-891 and update accordingly
       parameters:
         - name: global.repoURL
@@ -469,7 +469,7 @@ spec:
         - name: global.pattern
           value: mypattern
         - name: global.valuesDirectoryURL
-          value: https://github.com/pattern-clone/mypattern/raw/main
+          value: 
         - name: global.hubClusterDomain
           value: hub.example.com
         - name: global.localClusterDomain
@@ -507,8 +507,8 @@ spec:
     helm:
       ignoreMissingValueFiles: true
       valueFiles:
-      - "https://github.com/pattern-clone/mypattern/raw/main/values-global.yaml"
-      - "https://github.com/pattern-clone/mypattern/raw/main/values-example.yaml"
+      - "/values-global.yaml"
+      - "/values-example.yaml"
       # Watch the progress of https://issues.redhat.com/browse/GITOPS-891 and update accordingly
       parameters:
         - name: global.repoURL
@@ -520,7 +520,7 @@ spec:
         - name: global.pattern
           value: mypattern
         - name: global.valuesDirectoryURL
-          value: https://github.com/pattern-clone/mypattern/raw/main
+          value: 
         - name: global.hubClusterDomain
           value: hub.example.com
         - name: global.localClusterDomain
@@ -551,8 +551,8 @@ spec:
     \ generate:\n    command: [\"kustomize\"]\n    args: [\"build\", \"--enable-helm\"]\n- name:
     helm-with-kustomize\n  init:\n    command: [\"/bin/sh\", \"-c\"]\n    args: [\"helm
     dependency build\"]\n  generate:\n    command: [/bin/bash, -c]\n    args: [\"helm template . --name-template ${ARGOCD_APP_NAME:0:52}
-    -f https://github.com/pattern-clone/mypattern/raw/main/values-global.yaml
-    -f https://github.com/pattern-clone/mypattern/raw/main/values-example.yaml
+    -f /values-global.yaml
+    -f /values-example.yaml
     --set global.repoURL=$ARGOCD_APP_SOURCE_REPO_URL
     --set global.targetRevision=$ARGOCD_APP_SOURCE_TARGET_REVISION
     --set global.namespace=$ARGOCD_APP_NAMESPACE

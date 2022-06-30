@@ -78,8 +78,8 @@ spec:
     \ generate:\n    command: [\"kustomize\"]\n    args: [\"build\", \"--enable-helm\"]\n- name:
     helm-with-kustomize\n  init:\n    command: [\"/bin/sh\", \"-c\"]\n    args: [\"helm
     dependency build\"]\n  generate:\n    command: [/bin/bash, -c]\n    args: [\"helm template . --name-template ${ARGOCD_APP_NAME:0:52}
-    -f https://github.com/pattern-clone/common/raw/main/values-global.yaml
-    -f https://github.com/pattern-clone/common/raw/main/values-example.yaml
+    -f /values-global.yaml
+    -f /values-example.yaml
     --set global.repoURL=$ARGOCD_APP_SOURCE_REPO_URL
     --set global.targetRevision=$ARGOCD_APP_SOURCE_TARGET_REVISION
     --set global.namespace=$ARGOCD_APP_NAMESPACE

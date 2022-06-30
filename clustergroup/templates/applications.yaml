@@ -26,8 +26,13 @@ spec:
     helm:
       ignoreMissingValueFiles: true
       valueFiles:
+      {{- if .chart }}
       - "{{ coalesce .valuesDirectoryURL $.Values.global.valuesDirectoryURL }}/values-global.yaml"
       - "{{ coalesce .valuesDirectoryURL $.Values.global.valuesDirectoryURL }}/values-{{ $.Values.clusterGroup.name }}.yaml"
+      {{- else }}
+      - "{{ default "" .valuesDirectoryURL }}/values-global.yaml"
+      - "{{ default "" .valuesDirectoryURL }}/values-{{ $.Values.clusterGroup.name }}.yaml"
+      {{- end }}
       # Watch the progress of https://issues.redhat.com/browse/GITOPS-891 and update accordingly
       parameters:
         - name: global.repoURL
@@ -39,7 +44,11 @@ spec:
         - name: global.pattern
           value: {{ $.Values.global.pattern }}
         - name: global.valuesDirectoryURL
+          {{- if .chart }}
           value: {{ coalesce .valuesDirectoryURL $.Values.global.valuesDirectoryURL }}
+          {{- else }}
+          value: {{ default "" .valuesDirectoryURL }}
+          {{- end }}
         - name: global.hubClusterDomain
           value: {{ $.Values.global.hubClusterDomain }}
         - name: global.localClusterDomain
