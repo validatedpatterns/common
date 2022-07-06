@@ -562,8 +562,8 @@ spec:
       generate:
         command: ["/bin/bash", "-c"]
         args: ["helm template . --name-template ${ARGOCD_APP_NAME:0:52}
-            -f https://github.com/pattern-clone/mypattern/raw/main/values-global.yaml
-            -f https://github.com/pattern-clone/mypattern/raw/main/values-example.yaml
+            -f $(git rev-parse --show-toplevel)/values-global.yaml
+            -f $(git rev-parse --show-toplevel)/values-example.yaml
             --set global.repoURL=$ARGOCD_APP_SOURCE_REPO_URL
             --set global.targetRevision=$ARGOCD_APP_SOURCE_TARGET_REVISION
             --set global.namespace=$ARGOCD_APP_NAMESPACE
