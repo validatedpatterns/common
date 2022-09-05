@@ -4,3 +4,6 @@ mountRole: "hub-role"
 
 global:
   hubClusterDomain: hub.example.com
+
+clusterGroup:
+  name: example
