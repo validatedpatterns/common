@@ -17,25 +17,25 @@ clusterGroup:
   - open-cluster-management
 
   subscriptions:
-   - name: advanced-cluster-management
-     namespace: open-cluster-management
-     channel: release-2.5
-     csv: advanced-cluster-management.v2.5.0
+  - name: advanced-cluster-management
+    namespace: open-cluster-management
+    channel: release-2.5
+    csv: advanced-cluster-management.v2.5.0
 
   projects:
   - hub
   - config-demo
 
   applications:
-   - name: acm
-     namespace: open-cluster-management
-     project: hub
-     path: common/acm
-     ignoreDifferences:
-     - group: internal.open-cluster-management.io
-       kind: ManagedClusterInfo
-       jsonPointers:
-         - /spec/loggingCA
+  - name: acm
+    namespace: open-cluster-management
+    project: hub
+    path: common/acm
+    ignoreDifferences:
+    - group: internal.open-cluster-management.io
+      kind: ManagedClusterInfo
+      jsonPointers:
+        - /spec/loggingCA
 
   imperative:
     jobs: []
@@ -72,7 +72,7 @@ clusterGroup:
       value: region-one
     helmOverrides:
     - name: clusterGroup.isHubCluster
-      value: false
+      value: "false"
     clusterSelector:
       matchExpressions:
       - key: vendor
@@ -80,14 +80,14 @@ clusterGroup:
         values:
           - OpenShift
 #
-#secretStore:
-#  name: vault-backend
-#  kind: ClusterSecretStore
+secretStore:
+  name: vault-backend
+  kind: ClusterSecretStore
 
 # Depends on the value of 'vault_hub' ansible variable used 
 # during the installation
-#secretsBase:
-#  key: secret/data/hub
+secretsBase:
+  key: secret/data/hub
 #
 #  namespaces:
 #  - open-cluster-management

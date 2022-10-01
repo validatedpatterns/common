@@ -6,6 +6,15 @@
 		    "type": "object",
             "additionalProperties": false,
             "properties": {
+                "secretsBase": {
+                    "$ref": "#/definitions/SecretsBase"
+                },
+                "secretStore": {
+                    "$ref": "#/definitions/SecretStore"
+                },
+                "secrets": {
+                    "$ref": "#/definitions/Secrets"
+                },
                 "main": {
                     "$ref": "#/definitions/Main"
                 },
@@ -26,6 +35,97 @@
             "additionalProperties": false,
             "properties": {
                 "clusterGroupName": {
+                    "type": "string"
+=======
+        "SecretsBase": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "key": {
+                    "type": "string"
+                }
+			},
+            "required": [
+			  "key"
+			],
+            "title": "SecretsBase"
+        },
+        "SecretStore": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "kind": {
+                    "type": "string"
+                }
+			},
+            "required": [
+              "name",
+			  "kind"
+			],
+            "title": "SecretsStore"
+        },
+        "Secrets": {
+            "type": "object",
+            "additionalProperties": true,
+            "properties": {
+                "imageregistry": {
+                    "$ref": "#/definitions/ImageRegistry"
+                },
+                "git": {
+                    "$ref": "#/definitions/Git"
+                }
+			},
+            "required": [],
+            "title": "Secrets"
+        },
+        "ImageRegistry": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "account": {
+                    "type": "string"
+                },
+                "token": {
+                    "type": "string"
+                }
+			},
+            "required": [
+                "account",
+				"token"
+            ],
+            "title": "ImageRegistry"
+        },
+        "Git": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "username": {
+                    "type": "string"
+                },
+                "token": {
+                    "type": "string"
+                }
+			},
+            "required": [
+                "username",
+				"token"
+            ],
+            "title": "Git"
+        },
+        "Main": {
+            "type": "object",
+            "additionalProperties": true,
+            "properties": {
+                "clusterGroupName": {
+                    "type": "string"
+                },
+                "hubClusterDomain": {
+                    "type": "string"
+                },
+                "localClusterDomain": {
                     "type": "string"
                 }
             },
@@ -117,6 +217,9 @@
                     "items": {
                         "$ref": "#/definitions/ManagedClusterGroup"
                     }
+                },
+                "externalClusters": {
+                    "type": "array"
                 }
             },
             "required": [
@@ -255,8 +358,7 @@
             },
             "required": [
                 "name",
-                "playbook",
-                "timeout"
+                "playbook"
             ],
             "title": "Job"
         },
@@ -281,9 +383,6 @@
                 }
             },
             "required": [
-                "helmOverrides",
-                "labels",
-                "name"
             ],
             "title": "ManagedClusterGroup"
         },
@@ -295,7 +394,7 @@
                     "type": "string"
                 },
                 "value": {
-                    "type": "boolean"
+                    "type": "string"
                 }
             },
             "required": [
@@ -339,6 +438,9 @@
                 },
                 "csv": {
                     "type": "string"
+                },
+                "disabled": {
+                    "type": "boolean"
                 }
             },
             "required": [
