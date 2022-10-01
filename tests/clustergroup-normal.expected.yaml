@@ -58,26 +58,24 @@ data:
   values.yaml: |
     clusterGroup:
       applications:
-        acm:
-          ignoreDifferences:
-          - group: internal.open-cluster-management.io
-            jsonPointers:
-            - /spec/loggingCA
-            kind: ManagedClusterInfo
-          name: acm
-          namespace: open-cluster-management
-          path: common/acm
-          project: datacenter
-        external:
-          clusterName: example
-          name: external-app
-          namespace: demo
-          project: datacenter
-        pipe:
-          name: pipelines
-          namespace: application-ci
-          path: charts/datacenter/pipelines
-          project: datacenter
+      - ignoreDifferences:
+        - group: internal.open-cluster-management.io
+          jsonPointers:
+          - /spec/loggingCA
+          kind: ManagedClusterInfo
+        name: acm
+        namespace: open-cluster-management
+        path: common/acm
+        project: datacenter
+      - name: pipelines
+        namespace: application-ci
+        path: charts/datacenter/pipelines
+        project: datacenter
+      - clusterName: example
+        name: external-app
+        namespace: demo
+        path: charts/datacenter/external-app
+        project: datacenter
       externalClusters:
       - example
       imperative:
@@ -109,6 +107,8 @@ data:
             operator: In
             values:
             - OpenShift
+          matchLabels:
+            clusterGroup: factory
         helmOverrides:
         - name: clusterGroup.isHubCluster
           value: "false"
@@ -121,19 +121,18 @@ data:
       projects:
       - datacenter
       subscriptions:
-        acm:
-          channel: release-2.4
-          csv: advanced-cluster-management.v2.4.1
-          name: advanced-cluster-management
-          namespace: open-cluster-management
-        odh:
-          csv: opendatahub-operator.v1.1.0
-          disabled: true
-          name: opendatahub-operator
-          source: community-operators
-        pipelines:
-          csv: redhat-openshift-pipelines.v1.5.2
-          name: openshift-pipelines-operator-rh
+      - channel: release-2.4
+        csv: advanced-cluster-management.v2.4.1
+        name: advanced-cluster-management
+        namespace: open-cluster-management
+      - channel: stable
+        csv: opendatahub-operator.v1.1.0
+        disabled: true
+        name: opendatahub-operator
+        source: community-operators
+      - channel: pipelines-1.8
+        csv: redhat-openshift-pipelines.v1.5.2
+        name: openshift-pipelines-operator-rh
     global:
       git:
         account: hybrid-cloud-patterns
@@ -161,7 +160,7 @@ data:
       aws:
         s3Secret: test-secret
       cluster_example:
-        config: |-
+        config: |
           {
             \"bearerToken\": \"<bearer_token>\",
             \"tlsClientConfig\": {
@@ -177,6 +176,9 @@ data:
       imageregistry:
         account: test-account
         token: test-quay-token
+      secretStore:
+        kind: ClusterSecretStore
+        name: vault-backend
     secretsBase:
       key: secret/data/hub
 ---
@@ -511,19 +513,19 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: external-app
+  name: pipelines
   namespace: mypattern-example
   finalizers:
   - resources-finalizer.argocd.argoproj.io/foreground
 spec:
   destination:
-    name: example
-    namespace: demo
+    name: in-cluster
+    namespace: application-ci
   project: datacenter
   source:
     repoURL: https://github.com/pattern-clone/mypattern
     targetRevision: 
-    path: 
+    path: charts/datacenter/pipelines
     helm:
       ignoreMissingValueFiles: true
       valueFiles:
@@ -551,19 +553,19 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: pipelines
+  name: external-app
   namespace: mypattern-example
   finalizers:
   - resources-finalizer.argocd.argoproj.io/foreground
 spec:
   destination:
-    name: in-cluster
-    namespace: application-ci
+    name: example
+    namespace: demo
   project: datacenter
   source:
     repoURL: https://github.com/pattern-clone/mypattern
     targetRevision: 
-    path: charts/datacenter/pipelines
+    path: charts/datacenter/external-app
     helm:
       ignoreMissingValueFiles: true
       valueFiles:
@@ -778,6 +780,6 @@ spec:
   name: openshift-pipelines-operator-rh
   source: redhat-operators
   sourceNamespace: openshift-marketplace
-  channel: stable
+  channel: pipelines-1.8
   installPlanApproval: Automatic
   startingCSV: redhat-openshift-pipelines.v1.5.2

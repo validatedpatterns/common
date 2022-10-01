@@ -12,6 +12,16 @@ metadata:
   name: common-example
 spec: {}
 ---
+# Source: pattern-clustergroup/templates/namespaces.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    name: pattern
+    argocd.argoproj.io/managed-by: common-example
+  name: open-cluster-management
+spec:
+---
 # Source: pattern-clustergroup/templates/argocd-super-role.yaml
 # WARNING: ONLY USE THIS FOR MANAGING CLUSTERS NOT FOR REGULAR USERS
 apiVersion: rbac.authorization.k8s.io/v1
@@ -55,6 +65,100 @@ subjects:
   - kind: ServiceAccount
     name: example-gitops-argocd-dex-server
     namespace: common-example
+---
+# Source: pattern-clustergroup/templates/subscriptions.yaml
+---
+---
+# Source: pattern-clustergroup/templates/projects.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: hub
+  namespace: common-example
+spec:
+  description: "Pattern hub"
+  destinations:
+  - namespace: '*'
+    server: '*'
+  clusterResourceWhitelist:
+  - group: '*'
+    kind: '*'
+  namespaceResourceWhitelist:
+  - group: '*'
+    kind: '*'
+  sourceRepos:
+  - '*'
+status: {}
+---
+# Source: pattern-clustergroup/templates/projects.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: config-demo
+  namespace: common-example
+spec:
+  description: "Pattern config-demo"
+  destinations:
+  - namespace: '*'
+    server: '*'
+  clusterResourceWhitelist:
+  - group: '*'
+    kind: '*'
+  namespaceResourceWhitelist:
+  - group: '*'
+    kind: '*'
+  sourceRepos:
+  - '*'
+status: {}
+---
+# Source: pattern-clustergroup/templates/applications.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: acm
+  namespace: common-example
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io/foreground
+spec:
+  destination:
+    name: in-cluster
+    namespace: open-cluster-management
+  project: hub
+  source:
+    repoURL: 
+    targetRevision: 
+    path: common/acm
+    helm:
+      ignoreMissingValueFiles: true
+      valueFiles:
+      - "/values-global.yaml"
+      - "/values-example.yaml"
+      # Watch the progress of https://issues.redhat.com/browse/GITOPS-891 and update accordingly
+      parameters:
+        - name: global.repoURL
+          value: $ARGOCD_APP_SOURCE_REPO_URL
+        - name: global.targetRevision
+          value: $ARGOCD_APP_SOURCE_TARGET_REVISION
+        - name: global.namespace
+          value: $ARGOCD_APP_NAMESPACE
+        - name: global.pattern
+          value: common
+        - name: global.hubClusterDomain
+          value: 
+        - name: global.localClusterDomain
+          value: 
+  ignoreDifferences: [
+  {
+    "group": "internal.open-cluster-management.io",
+    "jsonPointers": [
+      "/spec/loggingCA"
+    ],
+    "kind": "ManagedClusterInfo"
+  }
+]
+  syncPolicy:
+    automated: {}
+    #  selfHeal: true
 ---
 # Source: pattern-clustergroup/templates/argocd.yaml
 apiVersion: argoproj.io/v1alpha1
@@ -180,3 +284,27 @@ spec:
   href: 'https://example-gitops-server-common-example.'
   location: ApplicationMenu
   text: 'Example ArgoCD'
+---
+# Source: pattern-clustergroup/templates/operatorgroup.yaml
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: open-cluster-management-operator-group
+  namespace: open-cluster-management
+spec:
+  targetNamespaces:
+  - open-cluster-management
+---
+# Source: pattern-clustergroup/templates/subscriptions.yaml
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: advanced-cluster-management
+  namespace: open-cluster-management
+spec:
+  name: advanced-cluster-management
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace
+  channel: release-2.5
+  installPlanApproval: Automatic
+  startingCSV: advanced-cluster-management.v2.5.0
