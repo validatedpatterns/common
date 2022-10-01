@@ -81,7 +81,7 @@
                     "$ref": "#/definitions/ImageRegistry"
                 },
                 "git": {
-                    "$ref": "#/definitions/Git"
+                    "$ref": "#/definitions/GitSecrets"
                 }
 			},
             "required": [],
@@ -104,7 +104,31 @@
             ],
             "title": "ImageRegistry"
         },
-        "Git": {
+        "GlobalGit": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "hostname": {
+                    "type": "string"
+                },
+                "account": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "dev_revision": {
+                    "type": "string"
+                }
+			},
+            "required": [
+                "hostname",
+                "account",
+				"email"
+            ],
+            "title": "GlobalGit"
+        },
+        "GitSecrets": {
             "type": "object",
             "additionalProperties": false,
             "properties": {
@@ -119,7 +143,7 @@
                 "username",
 				"token"
             ],
-            "title": "Git"
+            "title": "GitSecrets"
         },
         "Main": {
             "type": "object",
@@ -146,6 +170,21 @@
             "properties": {
                 "pattern": {
                     "type": "string"
+                },
+                "localClusterDomain": {
+                    "type": "string"
+                },
+                "hubClusterDomain": {
+                    "type": "string"
+                },
+                "namespace": {
+                    "type": "string"
+                },
+                "repoURL": {
+                    "type": "string"
+                },
+                "git": {
+                    "$ref": "#/definitions/GlobalGit"
                 },
                 "options": {
                     "$ref": "#/definitions/Options"
