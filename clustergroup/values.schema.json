@@ -1,0 +1,351 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "$ref": "#/definitions/ValidatedPatterns",
+    "definitions": {
+        "ValidatedPatterns": {
+		    "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "main": {
+                    "$ref": "#/definitions/Main"
+                },
+                "global": {
+                    "$ref": "#/definitions/Global"
+                },
+                "clusterGroup": {
+                    "$ref": "#/definitions/ClusterGroup"
+                }
+            },
+            "required": [
+                "clusterGroup"
+            ],
+            "title": "ValidatedPatterns"
+        },
+        "Main": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "clusterGroupName": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "clusterGroupName"
+            ],
+            "title": "Main"
+        },
+        "Global": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "pattern": {
+                    "type": "string"
+                },
+                "options": {
+                    "$ref": "#/definitions/Options"
+                }
+            },
+            "required": [
+                "options",
+                "pattern"
+            ],
+            "title": "Global"
+        },
+        "Options": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "useCSV": {
+                    "type": "boolean"
+                },
+                "syncPolicy": {
+                    "type": "string"
+                },
+                "installPlanApproval": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "installPlanApproval",
+                "syncPolicy",
+                "useCSV"
+            ],
+            "title": "Options"
+        },
+        "ClusterGroup": {
+		    "type": "object",
+			"additionalProperties": false,
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "isHubCluster": {
+                    "type": "boolean"
+                },
+                "insecureUnsealVaultInsideCluster": {
+                    "type": "boolean"
+                },
+                "namespaces": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "subscriptions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Subscription"
+                    }
+                },
+                "projects": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "applications": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Application"
+                    }
+                },
+                "imperative": {
+                    "$ref": "#/definitions/Imperative"
+                },
+                "managedClusterGroups": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ManagedClusterGroup"
+                    }
+                }
+            },
+            "required": [
+                "applications",
+                "imperative",
+                "insecureUnsealVaultInsideCluster",
+                "isHubCluster",
+                "managedClusterGroups",
+                "name",
+                "namespaces",
+                "projects",
+                "subscriptions"
+            ],
+            "title": "ClusterGroup"
+        },
+        "Application": {
+            "type": "object",
+            "additionalProperties": true,
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "namespace": {
+                    "type": "string"
+                },
+                "project": {
+                    "type": "string"
+                },
+                "path": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "name",
+                "namespace",
+                "path",
+                "project"
+            ],
+            "title": "Application"
+        },
+        "Imperative": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "jobs": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Job"
+                    }
+                },
+				"image": {
+					"type": "string",
+					"default": "registry.redhat.io/ansible-automation-platform-22/ee-supported-rhel8:latest"
+                },
+				"namespace": {
+					"type": "string",
+					"default": "imperative",
+					"enum": ["imperative"]
+                },
+				"serviceAccountCreate": {
+                    "type": "boolean"
+                },
+				"valuesConfigMap": {
+					"type": "string"
+                },
+				"cronJobName": {
+					"type": "string"
+                },
+				"jobName": {
+					"type": "string"
+                },
+				"imagePullPolicy": {
+					"type": "string",
+					"default": "Always",
+					"enum": ["Always", "IfNotPresent", "Never"]
+                },
+				"activeDeadlineSeconds": {
+					"type": "integer",
+					"default": 3600
+                },
+				"schedule": {
+					"type": "string",
+					"default": "*/10 * * * *"
+                },
+				"insecureUnsealVaultInsideClusterSchedule": {
+					"type": "string",
+				    "default": "*/5 * * * *"
+                },
+				"verbosity": {
+					"type": "string",
+					"default": "",
+					"enum": ["","-v", "-vv", "-vvv", "-vvvv"]
+                },
+				"serviceAccountName": {
+					"type": "string"
+                },
+				"clusterRoleName": {
+					"type": "string"
+                },
+				"clusterRoleYaml": {
+					"type": "string"
+                },
+				"roleName": {
+					"type": "string"
+                },
+				"roleYaml": {
+					"type": "string"
+                }
+            },
+            "required": [
+                "jobs",
+                "valuesConfigMap",
+                "cronJobName",
+                "jobName",
+                "activeDeadlineSeconds",
+                "schedule"
+            ],
+            "title": "Imperative"
+        },
+        "Job": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "playbook": {
+                    "type": "string"
+                },
+                "timeout": {
+                    "type": "integer"
+                },
+                "verbosity": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "name",
+                "playbook",
+                "timeout"
+            ],
+            "title": "Job"
+        },
+        "ManagedClusterGroup": {
+            "type": "object",
+            "additionalProperties": true,
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "labels": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Label"
+                    }
+                },
+                "helmOverrides": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/HelmOverride"
+                    }
+                }
+            },
+            "required": [
+                "helmOverrides",
+                "labels",
+                "name"
+            ],
+            "title": "ManagedClusterGroup"
+        },
+        "HelmOverride": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "boolean"
+                }
+            },
+            "required": [
+                "name",
+                "value"
+            ],
+            "title": "HelmOverride"
+        },
+        "Label": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "name",
+                "value"
+            ],
+            "title": "Label"
+        },
+        "Subscription": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "namespace": {
+                    "type": "string"
+                },
+                "source": {
+                    "type": "string"
+                },
+                "channel": {
+                    "type": "string"
+                },
+                "csv": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "name",
+                "channel"
+            ],
+            "title": "Subscription"
+        }
+    }
+}

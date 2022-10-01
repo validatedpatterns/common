@@ -13,6 +13,30 @@ clusterGroup:
   # is fundamentally insecure
   insecureUnsealVaultInsideCluster: false
 
+  namespaces:
+  - open-cluster-management
+
+  subscriptions:
+   - name: advanced-cluster-management
+     namespace: open-cluster-management
+     channel: release-2.5
+     csv: advanced-cluster-management.v2.5.0
+
+  projects:
+  - hub
+  - config-demo
+
+  applications:
+   - name: acm
+     namespace: open-cluster-management
+     project: hub
+     path: common/acm
+     ignoreDifferences:
+     - group: internal.open-cluster-management.io
+       kind: ManagedClusterInfo
+       jsonPointers:
+         - /spec/loggingCA
+
   imperative:
     jobs: []
     # This image contains ansible + kubernetes.core by default and is used to run the jobs
@@ -41,30 +65,29 @@ clusterGroup:
     roleName: imperative-role
     roleYaml: ""
 
-secretStore:
-  name: vault-backend
-  kind: ClusterSecretStore
+  managedClusterGroups:
+  - name: factory
+    labels:
+    - name: clusterGroup
+      value: region-one
+    helmOverrides:
+    - name: clusterGroup.isHubCluster
+      value: false
+    clusterSelector:
+      matchExpressions:
+      - key: vendor
+        operator: In
+        values:
+          - OpenShift
+#
+#secretStore:
+#  name: vault-backend
+#  kind: ClusterSecretStore
 
 # Depends on the value of 'vault_hub' ansible variable used 
 # during the installation
-secretsBase:
-  key: secret/data/hub
-
-#  managedClusterGroups:
-#  - name: factory
-#    # repoURL: https://github.com/dagger-refuse-cool/manuela-factory.git
-#    # Location of values-global.yaml, values-{name}.yaml, values-{app}.yaml
-#    targetRevision: main
-#    path: applications/factory
-#    helmOverrides:
-#    - name: clusterGroup.isHubCluster
-#      value: false
-#    clusterSelector:
-#      matchExpressions:
-#      - key: vendor
-#        operator: In
-#        values:
-#          - OpenShift
+#secretsBase:
+#  key: secret/data/hub
 #
 #  namespaces:
 #  - open-cluster-management
