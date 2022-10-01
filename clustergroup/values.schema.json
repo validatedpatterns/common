@@ -36,7 +36,13 @@
             "properties": {
                 "clusterGroupName": {
                     "type": "string"
-=======
+                }
+            },
+            "required": [
+                "clusterGroupName"
+            ],
+            "title": "Main"
+        },
         "SecretsBase": {
             "type": "object",
             "additionalProperties": false,
