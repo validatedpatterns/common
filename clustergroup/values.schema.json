@@ -30,19 +30,6 @@
             ],
             "title": "ValidatedPatterns"
         },
-        "Main": {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-                "clusterGroupName": {
-                    "type": "string"
-                }
-            },
-            "required": [
-                "clusterGroupName"
-            ],
-            "title": "Main"
-        },
         "SecretsBase": {
             "type": "object",
             "additionalProperties": false,
