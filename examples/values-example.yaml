@@ -12,28 +12,26 @@ clusterGroup:
   - application-ci
 
   subscriptions:
-    acm:
-      name: advanced-cluster-management
+    - name: advanced-cluster-management
       namespace: open-cluster-management
       channel: release-2.4
       csv: advanced-cluster-management.v2.4.1
 
-    odh:
-      name: opendatahub-operator
+    - name: opendatahub-operator
+      channel: stable
       source: community-operators
       csv: opendatahub-operator.v1.1.0
       disabled: true
 
-    pipelines:
-      name: openshift-pipelines-operator-rh
+    - name: openshift-pipelines-operator-rh
+      channel: pipelines-1.8 
       csv: redhat-openshift-pipelines.v1.5.2
 
   projects:
   - datacenter
 
   applications:
-    acm:
-      name: acm
+    - name: acm
       namespace: open-cluster-management
       project: datacenter
       path: common/acm
@@ -42,15 +40,16 @@ clusterGroup:
         kind: ManagedClusterInfo
         jsonPointers:
         - /spec/loggingCA
-    pipe:
-      name: pipelines
+    
+    - name: pipelines
       namespace: application-ci
       project: datacenter
       path: charts/datacenter/pipelines
-    external:
-      name: external-app
+
+    - name: external-app
       namespace: demo
       project: datacenter
+      path: charts/datacenter/external-app
       clusterName: example
 
   managedClusterGroups:
@@ -64,8 +63,8 @@ clusterGroup:
     - name: clusterGroup.isHubCluster
       value: "false"
     clusterSelector:
-#      matchLabels:
-#        clusterGroup: factory
+      matchLabels:
+        clusterGroup: factory
       matchExpressions:
       - key: vendor
         operator: In

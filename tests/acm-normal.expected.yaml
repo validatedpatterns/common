@@ -59,7 +59,10 @@ spec:
         "OpenShift"
       ]
     }
-  ]
+  ],
+  "matchLabels": {
+    "clusterGroup": "factory"
+  }
 }
 ---
 # Source: acm/templates/policies/ocp-gitops-policy.yaml
