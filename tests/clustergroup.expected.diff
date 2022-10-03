@@ -71,7 +71,7 @@
 +            kind: ManagedClusterInfo
 +          name: acm
 +          namespace: open-cluster-management
-+          path: common/managedClusters
++          path: common/managedclusters
 +          project: datacenter
 +        pipe:
 +          name: pipelines
@@ -494,7 +494,7 @@
 +  source:
 +    repoURL: https://github.com/pattern-clone/mypattern
 +    targetRevision: main
-+    path: common/managedClusters
++    path: common/managedclusters
 +    helm:
 +      ignoreMissingValueFiles: true
 +      valueFiles:
