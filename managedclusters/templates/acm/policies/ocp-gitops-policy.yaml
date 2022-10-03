@@ -1,7 +1,15 @@
+{{- $haveACM := false }}
+{{- range coalesce .Values.managedClusterGroups .Values.clusterGroup.managedClusterGroups }}
+{{- if not .hostedArgoSites }}
+{{- $haveACM = true }}
+{{- end }}
+{{- end }}
+{{- if $haveACM }}  
 apiVersion: policy.open-cluster-management.io/v1
 kind: Policy
 metadata:
   name: openshift-gitops-policy
+  namespace: open-cluster-management
   annotations:
     policy.open-cluster-management.io/standards: NIST-CSF
     policy.open-cluster-management.io/categories: PR.DS Data Security
@@ -49,6 +57,7 @@ apiVersion: policy.open-cluster-management.io/v1
 kind: PlacementBinding
 metadata:
   name: openshift-gitops-placement-binding
+  namespace: open-cluster-management
   annotations:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 placementRef:
@@ -64,6 +73,7 @@ apiVersion: apps.open-cluster-management.io/v1
 kind: PlacementRule
 metadata:
   name: openshift-gitops-placement
+  namespace: open-cluster-management
 spec:
   clusterConditions:
     - status: 'True'
@@ -74,3 +84,4 @@ spec:
         operator: In
         values:
           - OpenShift
+{{- end }}

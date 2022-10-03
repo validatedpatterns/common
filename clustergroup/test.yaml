@@ -32,7 +32,7 @@ clusterGroup:
       name: acm
       namespace: open-cluster-management
       project: hub
-      path: common/acm
+      path: common/managedclusters
       ignoreDifferences:
       - group: internal.open-cluster-management.io
         kind: ManagedClusterInfo
