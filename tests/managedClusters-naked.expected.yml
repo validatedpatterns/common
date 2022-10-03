@@ -1,0 +1,3 @@
+---
+# Source: acm/templates/acm/policies/application-policies.yaml
+# TODO: Also create a GitOpsCluster.apps.open-cluster-management.io

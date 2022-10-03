@@ -1,3 +1,10 @@
+{{- $haveACM := false }}
+{{- range coalesce .Values.global.managedClusterGroups .Values.clusterGroup.managedClusterGroups }}
+{{- if not .hostedArgoSites }}
+{{- $haveACM = true }}
+{{- end }}
+{{- end }}
+{{- if $haveACM }}  
 apiVersion: policy.open-cluster-management.io/v1
 kind: Policy
 metadata:
@@ -74,3 +81,4 @@ spec:
         operator: In
         values:
           - OpenShift
+{{- end }}

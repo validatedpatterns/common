@@ -1,5 +1,5 @@
 # TODO: Also create a GitOpsCluster.apps.open-cluster-management.io
-{{- range .Values.clusterGroup.managedClusterGroups }}
+{{- range coalesce .Values.global.managedClusterGroups .Values.clusterGroup.managedClusterGroups }}
 {{- $group := . }}
 {{- if not .hostedArgoSites }}
 apiVersion: policy.open-cluster-management.io/v1

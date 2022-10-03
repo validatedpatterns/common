@@ -1,5 +1,4 @@
-{{- if (eq .Values.enabled "all") }}
-{{- range .Values.clusterGroup.managedClusterGroups }}
+{{- range coalesce .Values.global.managedClusterGroups .Values.clusterGroup.managedClusterGroups }}
 {{- $group := . }}
 {{- if .hostedArgoSites }}
 apiVersion: argoproj.io/v1alpha1
@@ -172,6 +171,5 @@ spec:
     jsonPointers:
     - /status
 ---
-{{- end }}
 {{- end }}
 {{- end }}

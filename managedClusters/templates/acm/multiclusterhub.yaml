@@ -1,0 +1,16 @@
+{{- $haveACM := false }}
+{{- range coalesce .Values.global.managedClusterGroups .Values.clusterGroup.managedClusterGroups }}
+{{- if not .hostedArgoSites }}
+{{- $haveACM = true }}
+{{- end }}
+{{- end }}
+{{- if $haveACM }}  
+apiVersion: operator.open-cluster-management.io/v1
+kind: MultiClusterHub
+metadata:
+  name: multiclusterhub
+  namespace: open-cluster-management
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+spec: {}
+{{- end }}
