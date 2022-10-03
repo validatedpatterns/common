@@ -1,5 +1,5 @@
 {{- $haveACM := false }}
-{{- range coalesce .Values.global.managedClusterGroups .Values.clusterGroup.managedClusterGroups }}
+{{- range coalesce .Values.managedClusterGroups .Values.clusterGroup.managedClusterGroups }}
 {{- if not .hostedArgoSites }}
 {{- $haveACM = true }}
 {{- end }}

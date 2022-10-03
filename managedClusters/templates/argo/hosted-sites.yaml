@@ -1,4 +1,4 @@
-{{- range coalesce .Values.global.managedClusterGroups .Values.clusterGroup.managedClusterGroups }}
+{{- range coalesce .Values.managedClusterGroups .Values.clusterGroup.managedClusterGroups }}
 {{- $group := . }}
 {{- if .hostedArgoSites }}
 apiVersion: argoproj.io/v1alpha1
