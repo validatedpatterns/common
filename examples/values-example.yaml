@@ -36,7 +36,7 @@ clusterGroup:
       name: acm
       namespace: open-cluster-management
       project: datacenter
-      path: common/acm
+      path: common/managedClusters
       ignoreDifferences:
       - group: internal.open-cluster-management.io
         kind: ManagedClusterInfo
