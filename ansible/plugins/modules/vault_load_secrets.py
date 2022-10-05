@@ -191,6 +191,12 @@ def sanitize_values(module, syaml):
 
     secrets = syaml.get("secrets", {})
     files = syaml.get("files", {})
+
+    if (type(secrets) is not dict) or (type(files) is not dict): 
+        module.fail_json(
+            f"'secrets' must be of type dict of dicts if present and 'files' be of type dict if present: " f"{syaml}"
+        )
+
     if len(secrets) == 0 and len(files) == 0:
         module.fail_json(
             f"Neither 'secrets' nor 'files have any secrets to " f"be parsed: {syaml}"
@@ -205,7 +211,7 @@ def sanitize_values(module, syaml):
 
     for file in files:
         path = files[file]
-        if not os.path.isfile(path):
+        if not os.path.isfile(os.path.expanduser(path)):
             module.fail_json(f"File {path} does not exist")
 
     # If s3Secret key does not exist but s3.accessKey and s3.secretKey do exist
