@@ -191,9 +191,13 @@ def sanitize_values(module, syaml):
 
     secrets = syaml.get("secrets", {})
     files = syaml.get("files", {})
-    if len(secrets) == 0 and len(files) == 0:
+    if len(secrets) == 0:
         module.fail_json(
-            f"Neither 'secrets' nor 'files have any secrets to " f"be parsed: {syaml}"
+            f"The 'secrets' section is empty and does not have any secrets to " f"be parsed: {syaml}"
+        )
+    if len(files) == 0:
+        module.fail_json(
+            f"The 'files' section is empty and does not have any secrets to " f"be parsed: {syaml}"
         )
 
     for secret in secrets:
