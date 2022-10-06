@@ -502,6 +502,8 @@ metadata:
   namespace: mypattern-example
   finalizers:
   - resources-finalizer.argocd.argoproj.io/foreground
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
 spec:
   destination:
     name: in-cluster
@@ -553,6 +555,8 @@ metadata:
   namespace: mypattern-example
   finalizers:
   - resources-finalizer.argocd.argoproj.io/foreground
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
 spec:
   destination:
     name: in-cluster
