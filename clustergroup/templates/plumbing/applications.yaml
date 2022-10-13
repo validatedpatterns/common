@@ -1,3 +1,4 @@
+{{- $c := 1 | int64 }}
 {{- if not (eq .Values.enabled "core") }}
 {{- $namespace := print $.Values.global.pattern "-" $.Values.clusterGroup.name }}
 {{- if (eq .Values.enabled "plumbing") }}
@@ -123,6 +124,8 @@ metadata:
   namespace: {{ $namespace }}
   finalizers:
   - resources-finalizer.argocd.argoproj.io/foreground
+  annotations:
+    argocd.argoproj.io/sync-wave: {{ quote $c |}}
 spec:
   destination:
     name: {{ $.Values.clusterGroup.targetCluster }}
@@ -213,6 +216,7 @@ spec:
     #  selfHeal: true
   {{- end }}
 ---
+{{ $c = add1 $c }}
 {{- end }}
 {{- end }}
 {{- end }}
