@@ -12,7 +12,7 @@ spec:
   project: default
   source:
     repoURL: {{ .Values.main.git.repoURL }}
-    targetRevision: {{ .Values.main.git.revision }}
+    targetRevision: {{ .Values.main.git.revision | quote }}
     path: common/clustergroup
     helm:
       ignoreMissingValueFiles: true

@@ -22,7 +22,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/pattern-clone/mypattern
-    targetRevision: main
+    targetRevision: "main"
     path: common/clustergroup
     helm:
       ignoreMissingValueFiles: true

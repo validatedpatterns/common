@@ -8,4 +8,4 @@
 +  clusterGroupName: example
    gitSpec:
      targetRepo: https://github.com/pattern-clone/mypattern
-     targetRevision: main
+     targetRevision: "main"
