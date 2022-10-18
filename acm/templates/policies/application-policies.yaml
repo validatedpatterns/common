@@ -47,6 +47,7 @@ spec:
                       - "/values-{{ .name }}.yaml"
                       # We cannot use $.Values.global.clusterVersion because that gets resolved to the
                       # hub's cluster version, whereas we want to include the spoke cluster version
+                      - '/values-{{ `{{ (lookup "config.openshift.io/v1" "Infrastructure" "" "cluster").spec.platformSpec.type }}` }}-{{ .name }}.yaml'
                       - '/values-{{ `{{ printf "%d.%d" ((semver (lookup "operator.openshift.io/v1" "OpenShiftControllerManager" "" "cluster").status.version).Major) ((semver (lookup "operator.openshift.io/v1" "OpenShiftControllerManager" "" "cluster").status.version).Minor) }}` }}-{{ .name }}.yaml'
                       {{- range $valueFile := .extraValueFiles }}
                       - {{ $valueFile | quote }}
@@ -70,6 +71,8 @@ spec:
                       # Requires ACM 2.6 or higher (I could not come up with something less terrible to get maj.min)
                       - name: global.clusterVersion
                         value: '{{ `{{ printf "%d.%d" ((semver (lookup "operator.openshift.io/v1" "OpenShiftControllerManager" "" "cluster").status.version).Major) ((semver (lookup "operator.openshift.io/v1" "OpenShiftControllerManager" "" "cluster").status.version).Minor) }}` }}'
+                      - name: global.clusterPlatform
+                        value: '{{ `{{ (lookup "config.openshift.io/v1" "Infrastructure" "" "cluster").spec.platformSpec.type }}` }}'
                       - name: clusterGroup.name
                         value: {{ $group.name }}
                      {{- range .helmOverrides }}
