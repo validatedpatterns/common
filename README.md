@@ -16,3 +16,8 @@ do it manually by doing the following:
 git remote add -f upstream-common https://github.com/hybrid-cloud-patterns/common.git
 git merge -s subtree -Xtheirs -Xsubtree=common upstream-common/ha-vault
 ```
+
+## Please Note
+
+When updating `common/` in your pattern, please make sure you read the `Changes.md` file which contains
+all important changes/deprecations and additions.

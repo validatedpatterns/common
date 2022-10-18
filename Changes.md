@@ -1,5 +1,11 @@
 # Changes
 
+## October 18, 2022
+
+* Removed the legacy installation targets:
+  `deploy upgrade legacy-deploy legacy-upgrade`
+  Patterns must now use the operator-based installation
+
 ## October 13, 2022
 
 * Added global.clusterVersion as a new helm variable which represents the OCP

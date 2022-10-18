@@ -9,12 +9,9 @@ TARGET_ORIGIN ?= origin
 TARGET_REPO=$(shell git remote show $(TARGET_ORIGIN) | grep Push | sed -e 's/.*URL:[[:space:]]*//' -e 's%^git@%%' -e 's%^https://%%' -e 's%:%/%' -e 's%^%https://%')
 # git branch --show-current is also available as of git 2.22, but we will use this for compatibility
 TARGET_BRANCH=$(shell git rev-parse --abbrev-ref HEAD)
-HUBCLUSTER_APPS_DOMAIN=$(shell oc get ingresses.config/cluster -o jsonpath={.spec.domain})
-HUBCLUSTER_VERSION=$(shell oc get OpenShiftControllerManager/cluster -o jsonpath='{.status.version}' | sed -n -E 's/([0-9]+).([0-9]+).*/\1.\2/p')
 
 # --set values always take precedence over the contents of -f
-HELM_OPTS=-f values-global.yaml --set main.git.repoURL="$(TARGET_REPO)" --set main.git.revision=$(TARGET_BRANCH) \
-	--set global.hubClusterDomain=$(HUBCLUSTER_APPS_DOMAIN) --set global.clusterVersion="$(HUBCLUSTER_VERSION)" $(TARGET_SITE_OPT)
+HELM_OPTS=-f values-global.yaml --set main.git.repoURL="$(TARGET_REPO)" --set main.git.revision=$(TARGET_BRANCH)
 TEST_OPTS= -f values-global.yaml --set global.repoURL="https://github.com/pattern-clone/mypattern" \
 	--set main.git.repoURL="https://github.com/pattern-clone/mypattern" --set main.git.revision=main --set global.pattern="mypattern" \
 	--set global.namespace="pattern-namespace" --set global.hubClusterDomain=apps.hub.example.com --set global.localClusterDomain=apps.region.example.com --set global.clusterDomain=region.example.com\
@@ -30,7 +27,7 @@ help: ## This help message
 #  Makefiles in the individual patterns should call these targets explicitly
 #  e.g. from industrial-edge: make -f common/Makefile show
 show: ## show the starting template without installing it
-	helm template common/install/ --name-template $(NAME) $(HELM_OPTS)
+	helm template common/operator-install/ --name-template $(NAME) $(HELM_OPTS)
 
 CHARTS=$(shell find . -type f -iname 'Chart.yaml' -exec dirname "{}"  \; | sed -e 's/.\///')
 test: ## run helm tests
@@ -60,15 +57,11 @@ validate-origin: ## verify the git origin is available
 		echo "$(TARGET_REPO) - $(TARGET_BRANCH) exists" || \
 		(echo "$(TARGET_BRANCH) not found in $(TARGET_REPO)"; exit 1)
 
-# Default targets are "deploy" and "upgrade"; they can "move" to whichever install mechanism should be default.
-# legacy-deploy and legacy-upgrade should be present so that patterns don't need to depend on "deploy" and "upgrade"
-# pointing to one place or another, and don't need to change when they do (provide they use either legacy- or operator-
-# targets)
-deploy upgrade legacy-deploy legacy-upgrade: validate-prereq validate-origin ## deploys the pattern
-	helm upgrade --install $(NAME) common/install/ $(HELM_OPTS)
-
 operator-deploy operator-upgrade: validate-origin ## runs helm install
 	helm upgrade --install $(NAME) common/operator-install/ $(HELM_OPTS)
+
+deploy upgrade legacy-deploy legacy-upgrade: ## does nothing anymore. use operator-deploy
+	@echo "UNSUPPORTED TARGET: please switch to 'operator-deploy'"
 
 uninstall: ## runs helm uninstall
 	$(eval CSV := $(shell oc get subscriptions -n openshift-operators openshift-gitops-operator -ojsonpath={.status.currentCSV}))
