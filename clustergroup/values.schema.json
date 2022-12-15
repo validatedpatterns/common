@@ -160,6 +160,10 @@
           "type": "string",
           "description": "The account for the Git provider. Accounts allow you to organize and control access to that code. There are three types of accounts on GitHub.  Personal accounts Organization accounts Enterprise accounts e.g. hybrid-cloud-patterns or claudiol"
         },
+        "username": {
+          "type": "string",
+          "description": "The username for the Git provider."
+        },
         "email": {
           "type": "string",
           "description": "The contact email for the Git account. e.g. account@gmail.com"
