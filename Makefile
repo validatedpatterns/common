@@ -17,6 +17,12 @@ help: ## This help message
 	@printf "$$(grep -hE '^\S+:.*##' $(MAKEFILE_LIST) | sed -e 's/:.*##\s*/:/' -e 's/^\(.\+\):\(.*\)/\\x1b[36m\1\\x1b[m:\2/' | column -c2 -t -s :)\n"
 
 #  Makefiles in the individual patterns should call these targets explicitly
+#  e.g. from industrial-edge: make -f common/Makefile validate-schema
+.PHONY: validate-schema
+validate-schema: ## validate the schema against clustergroup for the pattern before deploying 
+	helm template common/clustergroup/ --name-template $(NAME) $(HELM_OPTS)
+
+#  Makefiles in the individual patterns should call these targets explicitly
 #  e.g. from industrial-edge: make -f common/Makefile show
 .PHONY: show
 show: ## show the starting template without installing it
