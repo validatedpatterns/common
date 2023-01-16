@@ -1,5 +1,9 @@
 # Changes
 
+## January 16, 2023
+
+* Added validate schema target as an option for patterns to use
+
 ## January 13, 2023
 
 * Simplify the secrets paths when using argo hosted sites
