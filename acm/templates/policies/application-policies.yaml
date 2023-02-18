@@ -133,7 +133,9 @@ spec:
   {{- else if (not $group.acmlabels) }}
   clusterSelector:
     matchLabels:
-      clusterGroup: {{ $group.name }}
+    {{- range $group.labels }}
+      {{ .name }}: {{ .value }}
+    {{- end }}
   {{- else if eq (len $group.acmlabels) 0 }}
   clusterSelector:
     matchLabels:
