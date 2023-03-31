@@ -617,7 +617,7 @@ spec:
       valueFiles:
       - "/values-global.yaml"
       - "/values-example.yaml"
-      - /"values-myxyz.yaml"
+      - "/values-myxyz.yaml"
       # Watch the progress of https://issues.redhat.com/browse/GITOPS-891 and update accordingly
       parameters:
         - name: global.repoURL
