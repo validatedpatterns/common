@@ -53,6 +53,14 @@ clusterGroup:
       project: datacenter
       path: charts/datacenter/pipelines
 
+    xyz:
+      name: xyz-chart
+      namespace: xyz
+      project: hub
+      path: charts/mgt-hub/xyz
+      extraValueFiles:
+      - values-myxyz.yaml
+
   imperative:
     namespace: imperative
     # NOTE: We *must* use lists and not hashes. As hashes lose ordering once parsed by helm

@@ -60,7 +60,7 @@ spec:
             - "/values-{{ $.Values.global.clusterVersion }}-{{ $.Values.clusterGroup.name }}.yaml"
             {{- end }}
         {{- range .extraValueFiles }}
-            - {{ . | quote }}
+            - /{{ . | quote }}
         {{- end }}
         {{- if .useGeneratorValues }}
           values: |-
@@ -162,7 +162,7 @@ spec:
       - "/values-{{ $.Values.global.clusterVersion }}-{{ $.Values.clusterGroup.name }}.yaml"
       {{- end }}
       {{- range $valueFile := .extraValueFiles }}
-      - {{ $valueFile | quote }}
+      - /{{ $valueFile | quote }}
       {{- end }}
       # Watch the progress of https://issues.redhat.com/browse/GITOPS-891 and update accordingly
       parameters:
