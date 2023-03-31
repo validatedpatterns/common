@@ -71,6 +71,13 @@ data:
           namespace: application-ci
           path: charts/datacenter/pipelines
           project: datacenter
+        xyz:
+          extraValueFiles:
+          - values-myxyz.yaml
+          name: xyz-chart
+          namespace: xyz
+          path: charts/mgt-hub/xyz
+          project: hub
       imperative:
         activeDeadlineSeconds: 3600
         clusterRoleName: imperative-cluster-role
@@ -564,6 +571,53 @@ spec:
       valueFiles:
       - "/values-global.yaml"
       - "/values-example.yaml"
+      # Watch the progress of https://issues.redhat.com/browse/GITOPS-891 and update accordingly
+      parameters:
+        - name: global.repoURL
+          value: $ARGOCD_APP_SOURCE_REPO_URL
+        - name: global.targetRevision
+          value: $ARGOCD_APP_SOURCE_TARGET_REVISION
+        - name: global.namespace
+          value: $ARGOCD_APP_NAMESPACE
+        - name: global.pattern
+          value: mypattern
+        - name: global.clusterDomain
+          value: region.example.com
+        - name: global.clusterVersion
+          value: ""
+        - name: global.clusterPlatform
+          value: ""
+        - name: global.hubClusterDomain
+          value: apps.hub.example.com
+        - name: global.localClusterDomain
+          value: apps.region.example.com
+  syncPolicy:
+    automated: {}
+    #  selfHeal: true
+---
+# Source: pattern-clustergroup/templates/plumbing/applications.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: xyz-chart
+  namespace: mypattern-example
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io/foreground
+spec:
+  destination:
+    name: in-cluster
+    namespace: xyz
+  project: hub
+  source:
+    repoURL: https://github.com/pattern-clone/mypattern
+    targetRevision: main
+    path: charts/mgt-hub/xyz
+    helm:
+      ignoreMissingValueFiles: true
+      valueFiles:
+      - "/values-global.yaml"
+      - "/values-example.yaml"
+      - /"values-myxyz.yaml"
       # Watch the progress of https://issues.redhat.com/browse/GITOPS-891 and update accordingly
       parameters:
         - name: global.repoURL
