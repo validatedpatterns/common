@@ -7,4 +7,9 @@ version: 0.0.1
 dependencies:
   - name: vault
     version: "0.24.1"
-    repository: "https://helm.releases.hashicorp.com"
+    repository: "file://subcharts/vault"
+    # below is the upstream repository. We point to the local one because
+    # helm will ignore any local subcharts in charts/ when the repository points
+    # to a remote entry. This only happens when the chart is part of a remote repository
+    # itself (i.e. we do not trigger this when everything is local in common/
+    # repository: "https://helm.releases.hashicorp.com"

@@ -1,7 +1,6 @@
 #!/bin/bash
 set -eu
 
-# Get the version of the dependency and then unquote it
 REPO="https://charts.external-secrets.io/index.yaml"
 NAME="external-secrets"
 CHARTDIR="subcharts"

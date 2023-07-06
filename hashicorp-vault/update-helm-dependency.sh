@@ -2,28 +2,35 @@
 set -eu
 
 # Get the version of the dependency and then unquote it
-TMPVER=$(sed -e '1,/^version:/ d' "Chart.yaml" | grep "version:" | awk '{ print $2 }')
-VERSION=$(eval echo "${TMPVER}")
-
-# Chart format is vault-0.21.0.tgz
+REPO="https://helm.releases.hashicorp.com/index.yaml"
 NAME="vault"
-TAR="${NAME}-${VERSION}.tgz"
-CHARTDIR="charts"
+CHARTDIR="subcharts"
+VERSION=$(yq '.dependencies[]|select(.name == "'$NAME'").version' Chart.yaml)
+URL=$(curl -L $REPO | yq '.entries.'$NAME'[]|select(.name == "'$NAME'" and .version == "'$VERSION'").urls[]')
+TMPD=$(mktemp -d /tmp/$NAME.XXXXX)
 
-if [ ! -f "${CHARTDIR}/${TAR}" ]; then
-	echo "Charts $TAR not found"
+trap cleanup SIGINT EXIT
+
+function cleanup {
+  echo "Cleaning up"
+  if [[ "${TMPD}" =~ /tmp.* ]]; then
+    rm -rf "${TMPD}"
+  fi
+}
+
+# We might have to deal with URLs being multiple, but so far that has not been the case for us
+echo "Fetching original upstream chart and decompressing it in 'subcharts/'"
+(cd "${TMPD}" && curl -L -o "${NAME}.tgz" "${URL}")
+tar xf "${TMPD}/${NAME}.tgz" -C "./${CHARTDIR}"
+if [ ! -d "${CHARTDIR}/${NAME}" ]; then
+	echo "Chart ${NAME} not found"
 	exit 1
 fi
 
-pushd "${CHARTDIR}"
-rm -rf "${NAME}"
-tar xfz "${TAR}"
-pushd "${NAME}"
+pushd "${CHARTDIR}/${NAME}"
 for i in ../../local-patches/*.patch; do
-	filterdiff "${i}" -p1 -x 'test/*' | patch -p1
+	filterdiff "${i}" -p1 -x 'test/*' | patch -p1 --no-backup-if-mismatch
 done
-find . -type f -iname '*.orig' -exec rm -f "{}" \;
 popd
-tar cvfz "${TAR}" "${NAME}"
-rm -rf "${NAME}"
-popd
+
+helm dependency update .
