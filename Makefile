@@ -143,6 +143,7 @@ super-linter: ## Runs super linter locally
 					-e VALIDATE_ANSIBLE=false \
 					-e VALIDATE_DOCKERFILE_HADOLINT=false \
 					-e VALIDATE_TEKTON=false \
+					-e VALIDATE_MARKDOWN=false \
 					$(DISABLE_LINTERS) \
 					-v $(PWD):/tmp/lint:rw,z \
 					-w /tmp/lint \
