@@ -107,7 +107,7 @@ validate-prereq: ## verify pre-requisites
 
 ##@ Test and Linters Tasks
 
-CHARTS=$(shell find . -type f -iname 'Chart.yaml' -exec dirname "{}"  \; | grep -v examples | sed -e 's/.\///')
+CHARTS=$(shell find . -type f -iname 'Chart.yaml' -exec dirname "{}"  \; | grep -v -e examples -e subcharts | sed -e 's/.\///')
 # Section related to tests and linting
 TEST_OPTS= -f values-global.yaml --set global.repoURL="https://github.com/pattern-clone/mypattern" \
 	--set main.git.repoURL="https://github.com/pattern-clone/mypattern" --set main.git.revision=main --set global.pattern="mypattern" \
