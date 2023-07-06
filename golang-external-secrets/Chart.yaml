@@ -7,5 +7,9 @@ version: 0.0.1
 dependencies:
   - name: external-secrets
     version: "0.8.3"
-    repository: "https://charts.external-secrets.io"
-    #"https://external-secrets.github.io/kubernetes-external-secrets"
+    repository: "file://subcharts/external-secrets"
+    # below is the upstream repository. We point to the local one because
+    # helm will ignore any local subcharts in charts/ when the repository points
+    # to a remote entry. This only happens when the chart is part of a remote repository
+    # itself (i.e. we do not trigger this when everything is local in common/
+    #repository: "https://charts.external-secrets.io"
