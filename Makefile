@@ -144,6 +144,7 @@ super-linter: ## Runs super linter locally
 					-e VALIDATE_DOCKERFILE_HADOLINT=false \
 					-e VALIDATE_TEKTON=false \
 					-e VALIDATE_MARKDOWN=false \
+					-e VALIDATE_NATURAL_LANGUAGE=false \
 					$(DISABLE_LINTERS) \
 					-v $(PWD):/tmp/lint:rw,z \
 					-w /tmp/lint \
