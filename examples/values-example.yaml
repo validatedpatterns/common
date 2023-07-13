@@ -58,6 +58,22 @@ clusterGroup:
         kind: ManagedClusterInfo
         jsonPointers:
         - /spec/loggingCA
+    acm-ms:
+      name: acm
+      namespace: open-cluster-management
+      sources:
+      - repoURL: 'https://charts.hybrid-cloud-patterns.io/'
+        targetRevision: 0.0.1
+        chart: acm
+      - repoURL: 'https://github.com/hybrid-cloud-patterns/multicloud-gitops'
+        targetRevision: main
+      project: datacenter
+      ignoreDifferences:
+      - group: internal.open-cluster-management.io
+        kind: ManagedClusterInfo
+        jsonPointers:
+        - /spec/loggingCA
+
     pipe:
       name: pipelines
       namespace: application-ci
