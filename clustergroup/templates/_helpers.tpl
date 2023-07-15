@@ -40,3 +40,21 @@ Default always defined valueFiles to be included in Applications
 - "/values-{{ $.Values.global.clusterVersion }}-{{ $.Values.clusterGroup.name }}.yaml"
 {{- end }}
 {{- end }} {{/* clustergroup.app.globalvalues.valuefiles */}}
+
+{{/*
+Default always defined valueFiles to be included in Applications multisource
+*/}}
+{{- define "clustergroup.app.globalvalues.multisource.valuefiles" -}}
+- "$gitref/values-global.yaml"
+- "$gitref/values-{{ $.Values.clusterGroup.name }}.yaml"
+{{- if $.Values.global.clusterPlatform }}
+- "$gitref/values-{{ $.Values.global.clusterPlatform }}.yaml"
+  {{- if $.Values.global.clusterVersion }}
+- "$gitref/values-{{ $.Values.global.clusterPlatform }}-{{ $.Values.global.clusterVersion }}.yaml"
+  {{- end }}
+- "$gitref/values-{{ $.Values.global.clusterPlatform }}-{{ $.Values.clusterGroup.name }}.yaml"
+{{- end }}
+{{- if $.Values.global.clusterVersion }}
+- "$gitref/values-{{ $.Values.global.clusterVersion }}-{{ $.Values.clusterGroup.name }}.yaml"
+{{- end }}
+{{- end }} {{/* clustergroup.app.globalvalues.multisource.valuefiles */}}
