@@ -4,7 +4,7 @@
 {{- $namespace = "openshift-gitops" }}
 {{- end }}
 {{- range .Values.clusterGroup.applications }}
-{{- if not (or (.generators) (.generatorFile) (.useGeneratorValues) (.destinationServer) (.destinationNamespace)) }}
+{{- if not (or (.sources) (.generators) (.generatorFile) (.useGeneratorValues) (.destinationServer) (.destinationNamespace)) }}
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
