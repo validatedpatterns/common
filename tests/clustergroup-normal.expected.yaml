@@ -80,6 +80,21 @@ data:
           namespace: open-cluster-management
           path: common/acm
           project: datacenter
+        acm-ms:
+          ignoreDifferences:
+          - group: internal.open-cluster-management.io
+            jsonPointers:
+            - /spec/loggingCA
+            kind: ManagedClusterInfo
+          name: acm
+          namespace: open-cluster-management
+          project: datacenter
+          sources:
+          - chart: acm
+            repoURL: https://charts.hybrid-cloud-patterns.io/
+            targetRevision: 0.0.1
+          - repoURL: https://github.com/hybrid-cloud-patterns/multicloud-gitops
+            targetRevision: main
         pipe:
           name: pipelines
           namespace: application-ci
@@ -510,6 +525,52 @@ spec:
   sourceRepos:
   - '*'
 status: {}
+---
+# Source: pattern-clustergroup/templates/plumbing/application-multisource.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: acm
+  namespace: mypattern-example
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io/foreground
+spec:
+  destination:
+    name: in-cluster
+    namespace: open-cluster-management
+  project: datacenter
+  sources:
+  - repoURL: https://charts.hybrid-cloud-patterns.io/
+    targetRevision: 0.0.1
+    chart: acm
+    helm:
+      ignoreMissingValueFiles: true
+      valueFiles:
+      - "$gitref/values-global.yaml"
+      - "$gitref/values-example.yaml"
+      # Watch the progress of https://issues.redhat.com/browse/GITOPS-891 and update accordingly
+      parameters:
+        - name: global.repoURL
+          value: $ARGOCD_APP_SOURCE_REPO_URL
+        - name: global.targetRevision
+          value: $ARGOCD_APP_SOURCE_TARGET_REVISION
+        - name: global.namespace
+          value: $ARGOCD_APP_NAMESPACE
+        - name: global.pattern
+          value: mypattern
+        - name: global.clusterDomain
+          value: region.example.com
+        - name: global.clusterVersion
+          value: ""
+        - name: global.clusterPlatform
+          value: ""
+        - name: global.hubClusterDomain
+          value: apps.hub.example.com
+        - name: global.localClusterDomain
+          value: apps.region.example.com
+  - repoURL: https://github.com/hybrid-cloud-patterns/multicloud-gitops
+    targetRevision: main
+    ref: gitref
 ---
 # Source: pattern-clustergroup/templates/plumbing/applications.yaml
 apiVersion: argoproj.io/v1alpha1
