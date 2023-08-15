@@ -18,3 +18,9 @@ spec:
     value: {{ .value }}
 {{- end }}
 {{- end }}
+{{- if .Values.main.extraValueFiles }}
+  extraValueFiles:
+{{- range .Values.main.extraValueFiles }}
+  - {{ . | quote }}
+{{- end }}
+{{- end }}
