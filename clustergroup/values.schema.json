@@ -83,6 +83,10 @@
             }
           }
         },
+        "extraValueFiles": {
+          "type": "array",
+          "description": "List of extra values files that will be passed to ArgoCD"
+        },
         "gitops": {
           "type": "object",
           "additionalProperties": false,
