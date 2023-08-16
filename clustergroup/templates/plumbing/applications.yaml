@@ -4,7 +4,8 @@
 {{- $namespace = "openshift-gitops" }}
 {{- end }}
 {{- range .Values.clusterGroup.applications }}
-{{- if or (.generators) (.generatorFile) (.useGeneratorValues) (.destinationServer) (.destinationNamespace) }}
+{{- if eq nil . }} {{- /* This allows us to null out an Application entry by specifying null instead of the normal dictionary */ }}
+{{- else if or (.generators) (.generatorFile) (.useGeneratorValues) (.destinationServer) (.destinationNamespace) }}
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
