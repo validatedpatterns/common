@@ -174,6 +174,28 @@ ansible-lint: ## run ansible lint on ansible/ folder
 ansible-unittest: ## run ansible unit tests
 	pytest -r a --fulltrace --color yes ansible/tests/unit/test_*.py
 
+##### HostedCluster Management tasks
+
+NAME ?= utility-container
+TAG ?= latest
+CONTAINER ?= $(NAME):$(TAG)
+REGISTRY ?= quay.io/hybridcloudpatterns.io
+
+.PHONY: cluster-status
+cluster-status: ## Checks the status of hosted-cluster machines
+	@echo "Getting status of hosted-cluster nodes"
+	python3 /usr/local/bin/status-instances.py -f ${CLUSTER}
+
+.PHONY: cluster-start
+cluster-start: ## Starts the hosted-cluster machines
+	@echo "Starting hosted-cluster nodes"
+	python3 /usr/local/bin/start-instances.py -f ${CLUSTER}
+
+.PHONY: cluster-stop
+cluster-stop: ## Stoops the hosted-cluster machines
+	@echo "Stopping hosted-cluster nodes"
+	python3 /usr/local/bin/stop-instances.py -f ${CLUSTER}
+
 .PHONY: deploy upgrade legacy-deploy legacy-upgrade
 deploy upgrade legacy-deploy legacy-upgrade:
 	@echo "UNSUPPORTED TARGET: please switch to 'operator-deploy'"; exit 1

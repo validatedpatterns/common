@@ -33,6 +33,7 @@ podman run -it --rm \
 	-e KUBECONFIG \
 	-v "${HOME}":"${HOME}" \
 	-v "${HOME}":/pattern-home \
+	-v "${HOME}/.aws":/pattern-home/.aws \
 	-v "${HOME}":/root \
 	-w "$(pwd)" \
 	"$PATTERN_UTILITY_CONTAINER" \
