@@ -25,6 +25,9 @@
         },
         "clusterGroup": {
           "$ref": "#/definitions/ClusterGroup"
+        },
+        "cloudProvider": {
+          "$ref": "#/definitions/CloudProvider"
         }
       },
       "required": [
@@ -903,6 +906,22 @@
         "domain"
       ],
       "title": "HostedArgoSites"
+    },
+    "CloudProvider": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "storageClass": {
+          "type": "string"
+        },
+        "provisioner": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "storageClass"
+      ],
+      "title": "CloudProvider"
     }
   }
 }
