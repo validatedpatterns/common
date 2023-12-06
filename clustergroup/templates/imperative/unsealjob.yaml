@@ -1,5 +1,11 @@
 {{- if not (eq .Values.enabled "plumbing") }}
-{{- if $.Values.clusterGroup.isHubCluster }}
+{{- $hasVault := false }}
+{{- range .Values.clusterGroup.applications }}
+{{- if eq .path "common/hashicorp-vault" }}
+{{- $hasVault := true }}
+{{- end }} {{- /* if eq .path ... */}}
+{{- end }} {{- /* range .Values.clusterGroup.applications */}}
+{{- if and $.Values.clusterGroup.isHubCluster $hasVault }}
 ---
 apiVersion: batch/v1
 kind: CronJob
