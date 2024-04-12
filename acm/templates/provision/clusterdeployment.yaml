@@ -1,0 +1,161 @@
+{{- range .Values.clusterGroup.managedClusterGroups }}
+{{- $group := . }}
+
+{{- if $group.clusterDeployments }}
+
+---
+apiVersion: cluster.open-cluster-management.io/v1beta2
+kind: ManagedClusterSet
+metadata:
+  name: {{ $group.name }}
+  annotations:
+    cluster.open-cluster-management.io/submariner-broker-ns: {{ $group.name }}-broker
+
+---
+{{- range $group.clusterDeployments}}
+{{ $cluster := . }}
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ $cluster.name }}
+
+---
+apiVersion: external-secrets.io/v1beta1
+kind: ExternalSecret
+metadata:
+  name: {{ $cluster.name }}-cluster-private-key
+  namespace: {{ $cluster.name }}
+spec:
+  dataFrom:
+    - extract:
+        conversionStrategy: Default
+        decodingStrategy: None
+        key: secret/hub/privatekey
+        metadataPolicy: None
+  refreshInterval: 24h0m0s
+  secretStoreRef:
+    kind: ClusterSecretStore
+    name: vault-backend
+  target:
+    creationPolicy: Owner
+    deletionPolicy: Retain
+    name: {{ $cluster.name }}-cluster-private-key
+    template:
+      engineVersion: v2
+      mergePolicy: Replace
+      type: Opaque
+
+---
+apiVersion: external-secrets.io/v1beta1
+kind: ExternalSecret
+metadata:
+  name: {{ $cluster.name }}-cluster-pull-secret
+  namespace: {{ $cluster.name }}
+spec:
+  dataFrom:
+    - extract:
+        conversionStrategy: Default
+        decodingStrategy: None
+        key: secret/hub/openshiftPullSecret
+        metadataPolicy: None
+  refreshInterval: 24h0m0s
+  secretStoreRef:
+    kind: ClusterSecretStore
+    name: vault-backend
+  target:
+    creationPolicy: Owner
+    deletionPolicy: Retain
+    name: {{ $cluster.name }}-cluster-pull-secret
+    template:
+      engineVersion: v2
+      mergePolicy: Replace
+      type: Opaque
+
+---
+apiVersion: external-secrets.io/v1beta1
+kind: ExternalSecret
+metadata:
+  name: {{ $cluster.name }}-cluster-aws-creds
+  namespace: {{ $cluster.name }}
+spec:
+  dataFrom:
+    - extract:
+        conversionStrategy: Default
+        decodingStrategy: None
+        key: secret/hub/aws
+        metadataPolicy: None
+  refreshInterval: 24h0m0s
+  secretStoreRef:
+    kind: ClusterSecretStore
+    name: vault-backend
+  target:
+    creationPolicy: Owner
+    deletionPolicy: Retain
+    name: {{ $cluster.name }}-cluster-aws-creds
+    template:
+      engineVersion: v2
+      mergePolicy: Replace
+      type: Opaque
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ $cluster.name }}-cluster-install-config
+  namespace: {{ $cluster.name }}
+type: Opaque
+data:
+  install-config.yaml: {{ toYaml $cluster.install_config | b64enc }}
+
+---
+apiVersion: hive.openshift.io/v1
+kind: ClusterDeployment
+metadata:
+  name: {{ $cluster.name }}
+  namespace: {{ $cluster.name }}
+  labels:
+    vendor: OpenShift
+spec:
+  baseDomain: {{ $cluster.install_config.baseDomain }}
+  clusterName: {{ $cluster.name }}
+  installAttemptsLimit: 1
+  platform:
+{{- if $cluster.install_config.platform.aws }}
+    aws:
+      credentialsSecretRef:
+        name: {{ $cluster.name }}-cluster-aws-creds
+      region: {{ $cluster.install_config.platform.aws.region }}
+{{- end }}
+  provisioning:
+    installConfigSecretRef:
+      name: {{ $cluster.name }}-cluster-install-config
+    sshPrivateKeySecretRef:
+      name: {{ $cluster.name }}-cluster-private-key
+    imageSetRef:
+      name: img{{ $cluster.version }}-multi-appsub
+  pullSecretRef:
+    name: {{ $cluster.name }}-cluster-pull-secret
+
+---
+apiVersion: cluster.open-cluster-management.io/v1
+kind: ManagedCluster
+metadata:
+  labels:
+    cluster.open-cluster-management.io/clusterset: {{ $group.name }}
+  {{- if (not $group.acmlabels) }}
+    clusterGroup: {{ $group.name }}
+  {{- else if eq (len $group.acmlabels) 0 }}
+    clusterGroup: {{ $group.name }}
+  {{- else }}
+    {{- range $group.acmlabels }}
+    {{ .name }}: {{ .value }}
+    {{- end }}
+  {{- end }}
+  name: {{ $cluster.name }}
+spec:
+  hubAcceptsClient: true
+
+{{- end }}{{- /* range $group.clusterDeployments */}}
+{{- end }}{{- /* if $group.clusterDeployments) */}}
+{{- end }}{{- /* range .Values.clusterGroup.managedClusterGroups */}}

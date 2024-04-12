@@ -29,6 +29,54 @@ clusterGroup:
 #      labels:
 #      - name: clusterGroup
 #        value: region-one
+#    testRegionTwo:
+#      name: region-two
+#      labels:
+#        - name: clusterGroup
+#          value: region-two
+#      clusterDeployments:
+#        - name: mcluster1
+#          version: 4.14.12
+#          # See OpenShift documentation for install config spec
+#          # https://docs.openshift.com/container-platform/4.14/installing/installing_aws/installing-aws-customizations.html
+#          install_config:
+#            apiVersion: v1
+#            metadata:
+#              name: mcluster1
+#            baseDomain: example-domain.com
+#            controlPlane:
+#              name: master
+#              replicas: 3
+#              platform:
+#                aws:
+#                  type: m5.2xlarge
+#                  zones:
+#                  - ca-central-1a
+#            compute:
+#            - name: worker
+#              replicas: 5
+#              platform:
+#                aws:
+#                  type: m5.2xlarge
+#                  zones:
+#                  - ca-central-1a
+#            networking:
+#              clusterNetwork:
+#              - cidr: 10.128.0.0/14
+#                hostPrefix: 23
+#              machineNetwork:
+#              - cidr: 10.0.0.0/16
+#              networkType: OpenShiftSDN
+#              serviceNetwork:
+#              - 172.30.0.0/16
+#            platform:
+#              aws:
+#                region: ca-central-1
+#                userTags:
+#                  project: ValidatedPatterns
+#            publish: External
+#            sshKey: ""
+#            pullSecret: ""
 
 secretStore:
   name: vault-backend
