@@ -187,8 +187,8 @@ spec:
     route:
       enabled: true
       tls:
-        insecureEdgeTerminationPolicy: Redirect
-        termination: reencrypt
+        insecureEdgeTerminationPolicy: {{ default "Redirect" (((.Values.global.argocdServer).route).tls).insecureEdgeTerminationPolicy }}
+        termination: {{ default "reencrypt" (((.Values.global.argocdServer).route).tls).termination }}
     service:
       type: ""
   tls:
