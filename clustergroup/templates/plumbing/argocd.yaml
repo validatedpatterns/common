@@ -186,6 +186,7 @@ spec:
         memory: 128Mi
     route:
       enabled: true
+      {{/* Adding parameters for controlling the ArgoCD Server route tls options */}}
       tls:
         insecureEdgeTerminationPolicy: {{ default "Redirect" (((.Values.global.argocdServer).route).tls).insecureEdgeTerminationPolicy }}
         termination: {{ default "reencrypt" (((.Values.global.argocdServer).route).tls).termination }}
