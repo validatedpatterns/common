@@ -1,4 +1,5 @@
 {{- if not (eq .Values.enabled "plumbing") }}
+{{- if $.Values.clusterGroup.imperative.enabled }}
 {{/* This is always defined as we always unseal the cluster with an imperative job */}}
 apiVersion: v1
 kind: Namespace
@@ -7,4 +8,5 @@ metadata:
     name: {{ $.Values.clusterGroup.imperative.namespace }}
     argocd.argoproj.io/managed-by: {{ $.Values.global.pattern }}-{{ $.Values.clusterGroup.name }}
   name: {{ $.Values.clusterGroup.imperative.namespace }}
+{{- end }} {{/* if $.Values.clusterGroup.imperative.enabled */}}
 {{- end }}

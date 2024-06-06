@@ -1,4 +1,5 @@
 {{- if not (eq .Values.enabled "plumbing") }}
+{{- if $.Values.clusterGroup.imperative.enabled }}
 {{/* This is always defined as we always unseal the cluster with an imperative job */}}
 {{- if $.Values.clusterGroup.imperative.serviceAccountCreate }}
 ---
@@ -34,4 +35,5 @@ rules:
     verbs:
     - '*'
 {{- end }} {{/* if $.Values.clusterGroup.imperative.adminServiceAccountCreate */}}
+{{- end }} {{/* if $.Values.clusterGroup.imperative.enabled */}}
 {{- end }}
