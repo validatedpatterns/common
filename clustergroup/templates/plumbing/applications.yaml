@@ -127,6 +127,10 @@ metadata:
   namespace: {{ $namespace }}
   labels:
     validatedpatterns.io/pattern: {{ $.Values.global.pattern }}
+  {{- if .syncWave }}
+  annotations:
+    argocd.argoproj.io/sync-wave: {{ .syncWave }}
+  {{- end }}
   finalizers:
   - resources-finalizer.argocd.argoproj.io/foreground
 spec:
