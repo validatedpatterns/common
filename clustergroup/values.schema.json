@@ -247,6 +247,10 @@
           "type": "boolean",
           "deprecated": true
         },
+        "syncWave": {
+          "type": "integer",
+          "description": "This controls the order in which ArgoCD applications are created. Appplications in subsequent waves will not be created until previous applications have synchronized and become healthy."
+        },
         "syncPolicy": {
           "type": "string",
           "description": "This is the sync policy for the ArgoCD applications. When set to Automatic ArgoCD will automatically sync an application when it detects differences between the desired manifests in Git."
