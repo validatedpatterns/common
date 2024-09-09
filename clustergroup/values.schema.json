@@ -712,6 +712,10 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        },
         "jobs": {
           "type": "array",
           "items": {

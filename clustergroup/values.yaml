@@ -57,6 +57,7 @@ clusterGroup:
         - PipelineRun
 
   imperative:
+    enabled: true
     jobs: []
     # This image contains ansible + kubernetes.core by default and is used to run the jobs
     image: registry.redhat.io/ansible-automation-platform-24/ee-supported-rhel9:latest

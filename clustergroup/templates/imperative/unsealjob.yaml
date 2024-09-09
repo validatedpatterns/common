@@ -2,6 +2,7 @@
      why we avoid using the default function */}}
 {{- if or (eq .Values.global.secretStore.backend "vault") (not (hasKey .Values.global.secretStore "backend")) }}
 {{- if not (eq .Values.enabled "plumbing") }}
+{{- if $.Values.clusterGroup.imperative.enabled }}
 {{- if $.Values.clusterGroup.isHubCluster }}
 ---
 apiVersion: batch/v1
@@ -55,5 +56,6 @@ spec:
           {{- include "imperative.volumes_ca" . | indent 12 }}
           restartPolicy: Never
 {{- end }}
+{{- end }} {{/* if $.Values.clusterGroup.imperative.enabled */}}
 {{- end }}
 {{- end }}

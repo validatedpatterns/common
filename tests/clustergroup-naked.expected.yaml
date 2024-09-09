@@ -83,6 +83,7 @@ data:
         clusterRoleName: imperative-cluster-role
         clusterRoleYaml: ""
         cronJobName: imperative-cronjob
+        enabled: true
         image: registry.redhat.io/ansible-automation-platform-24/ee-supported-rhel9:latest
         imagePullPolicy: Always
         insecureUnsealVaultInsideClusterSchedule: '*/5 * * * *'
