@@ -31,9 +31,9 @@ TARGET_BRANCH ?= $(shell git rev-parse --abbrev-ref HEAD)
 #default to the branch remote
 TARGET_ORIGIN ?= $(shell git config branch.$(TARGET_BRANCH).remote)
 
-# This is to ensure that whether we start with a git@ or https:// URL, we end up with an https:// URL
+# This is to ensure that whether we start with a git@ URL, we convert it to https://, but preserve http:// vs https:// for existing URLs
 # This is because we expect to use tokens for repo authentication as opposed to SSH keys
-TARGET_REPO=$(shell git ls-remote --get-url --symref $(TARGET_ORIGIN) | sed -e 's/.*URL:[[:space:]]*//' -e 's%^git@%%' -e 's%^https://%%' -e 's%:%/%' -e 's%^%https://%')
+TARGET_REPO=$(shell git ls-remote --get-url --symref $(TARGET_ORIGIN) | sed -e 's/.*URL:[[:space:]]*//' -e 's%^git@\([^:]*\):%https://\1/%')
 
 UUID_FILE ?= ~/.config/validated-patterns/pattern-uuid
 UUID_HELM_OPTS ?=
