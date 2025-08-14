@@ -79,7 +79,7 @@ help: ## This help message
 #  e.g. from industrial-edge: make -f common/Makefile show
 .PHONY: show
 show: ## show the starting template without installing it
-	helm template $(PATTERN_INSTALL_CHART) --name-template $(NAME) $(HELM_OPTS)
+	ansible-playbook $(EXTRA_PLAYBOOK_OPTS) rhvp.cluster_utils.show
 
 preview-all: ## (EXPERIMENTAL) Previews all applications on hub and managed clusters
 	@echo "NOTE: This is just a tentative approximation of rendering all hub and managed clusters templates"
