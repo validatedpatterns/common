@@ -1,72 +1,6 @@
-NAME ?= $(shell basename "`pwd`")
-
-ifneq ($(origin TARGET_SITE), undefined)
-  TARGET_SITE_OPT=--set main.clusterGroupName=$(TARGET_SITE)
-endif
-
-# Set this to true if you want to skip any origin validation
-DISABLE_VALIDATE_ORIGIN ?= false
-ifeq ($(DISABLE_VALIDATE_ORIGIN),true)
-  VALIDATE_ORIGIN :=
-else
-  VALIDATE_ORIGIN := validate-origin
-endif
-
-# This variable can be set in order to pass additional helm arguments from the
-# the command line. I.e. we can set things without having to tweak values files
-EXTRA_HELM_OPTS ?=
-
-# This variable can be set in order to pass additional ansible-playbook arguments from the
-# the command line. I.e. we can set -vvv for more verbose logging
-EXTRA_PLAYBOOK_OPTS ?=
-
-# INDEX_IMAGES=registry-proxy.engineering.redhat.com/rh-osbs/iib:394248
-# or
-# INDEX_IMAGES=registry-proxy.engineering.redhat.com/rh-osbs/iib:394248,registry-proxy.engineering.redhat.com/rh-osbs/iib:394249
-INDEX_IMAGES ?=
-
-# git branch --show-current is also available as of git 2.22, but we will use this for compatibility
-TARGET_BRANCH ?= $(shell git rev-parse --abbrev-ref HEAD)
-
-#default to the branch remote
-TARGET_ORIGIN ?= $(shell git config branch.$(TARGET_BRANCH).remote)
-
-# The URL for the configured origin (could be HTTP/HTTPS/SSH)
-TARGET_REPO_RAW := $(shell git ls-remote --get-url --symref $(TARGET_ORIGIN))
-
-UUID_FILE ?= ~/.config/validated-patterns/pattern-uuid
-UUID_HELM_OPTS ?=
-
-# --set values always take precedence over the contents of -f
-ifneq ("$(wildcard $(UUID_FILE))","")
-	UUID := $(shell cat $(UUID_FILE))
-	UUID_HELM_OPTS := --set main.analyticsUUID=$(UUID)
-endif
-
-# Set the secret name *and* its namespace when deploying from private repositories
-# The format of said secret is documented here: https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/#repositories
-TOKEN_SECRET ?=
-TOKEN_NAMESPACE ?=
-
-ifeq ($(TOKEN_SECRET),)
-  # SSH agents are not created for public repos (repos with no secret token) by the patterns operator so we convert to HTTPS
-  TARGET_REPO := $(shell echo "$(TARGET_REPO_RAW)" | sed 's/^git@\(.*\):\(.*\)/https:\/\/\1\/\2/')
-  SECRET_OPTS :=
-else
-  TARGET_REPO := $(TARGET_REPO_RAW)
-  SECRET_OPTS := --set main.tokenSecret=$(TOKEN_SECRET) --set main.tokenSecretNamespace=$(TOKEN_NAMESPACE)
-endif
-
-HELM_OPTS := -f values-global.yaml \
-             --set main.git.repoURL="$(TARGET_REPO)" \
-             --set main.git.revision=$(TARGET_BRANCH) \
-             $(SECRET_OPTS) \
-             $(TARGET_SITE_OPT) \
-             $(UUID_HELM_OPTS) \
-             $(EXTRA_HELM_OPTS)
-
-# Helm does the right thing and fetches all the tags and detects the newest one
-PATTERN_INSTALL_CHART ?= oci://quay.io/hybridcloudpatterns/pattern-install
+MAKEFLAGS += --no-print-directory
+# ANSIBLE_RUN = ansible-playbook $(EXTRA_PLAYBOOK_OPTS) -vvv
+ANSIBLE_RUN = ANSIBLE_STDOUT_CALLBACK=null ansible-playbook $(EXTRA_PLAYBOOK_OPTS)
 
 ##@ Pattern Common Tasks
 
@@ -79,15 +13,13 @@ help: ## This help message
 #  e.g. from industrial-edge: make -f common/Makefile show
 .PHONY: show
 show: ## show the starting template without installing it
-	ansible-playbook $(EXTRA_PLAYBOOK_OPTS) rhvp.cluster_utils.show
+	@$(ANSIBLE_RUN) rhvp.cluster_utils.show
 
 preview-all: ## (EXPERIMENTAL) Previews all applications on hub and managed clusters
-	@echo "NOTE: This is just a tentative approximation of rendering all hub and managed clusters templates"
-	@common/scripts/preview-all.sh $(TARGET_REPO) $(TARGET_BRANCH)
+	@$(ANSIBLE_RUN) rhvp.cluster_utils.preview_all
 
 preview-%:
-	$(eval CLUSTERGROUP ?= $(shell yq ".main.clusterGroupName" values-global.yaml))
-	@common/scripts/preview.sh $(CLUSTERGROUP) $* $(TARGET_REPO) $(TARGET_BRANCH)
+	@$(ANSIBLE_RUN) -e app=$* rhvp.cluster_utils.preview
 
 .PHONY: operator-deploy
 operator-deploy operator-upgrade: validate-prereq $(VALIDATE_ORIGIN) validate-cluster ## runs helm install
