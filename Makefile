@@ -21,15 +21,23 @@ preview-all: ## (EXPERIMENTAL) Previews all applications on hub and managed clus
 preview-%:
 	@$(ANSIBLE_RUN) -e app=$* rhvp.cluster_utils.preview
 
+# Set this to true if you want to skip any origin validation
+DISABLE_VALIDATE_ORIGIN ?= false
+ifeq ($(DISABLE_VALIDATE_ORIGIN),true)
+  VALIDATE_ORIGIN :=
+else
+  VALIDATE_ORIGIN := validate-origin
+endif
+
 .PHONY: operator-deploy
 operator-deploy operator-upgrade: validate-prereq $(VALIDATE_ORIGIN) validate-cluster ## runs helm install
 	@common/scripts/deploy-pattern.sh $(NAME) $(PATTERN_INSTALL_CHART) $(HELM_OPTS)
 
-.PHONY: uninstall
-uninstall: ## runs helm uninstall
-	$(eval CSV := $(shell oc get subscriptions -n openshift-operators openshift-gitops-operator -ojsonpath={.status.currentCSV}))
-	helm uninstall $(NAME)
-	@oc delete csv -n openshift-operators $(CSV)
+# .PHONY: uninstall
+# uninstall: ## runs helm uninstall
+# 	$(eval CSV := $(shell oc get subscriptions -n openshift-operators openshift-gitops-operator -ojsonpath={.status.currentCSV}))
+# 	helm uninstall $(NAME)
+# 	@oc delete csv -n openshift-operators $(CSV)
 
 .PHONY: load-secrets
 load-secrets: ## loads the secrets into the backend determined by values-global setting
@@ -117,31 +125,7 @@ validate-schema: ## validates values files against schema in common/clustergroup
 
 .PHONY: validate-prereq
 validate-prereq: ## verify pre-requisites
-	$(eval GLOBAL_PATTERN := $(shell yq -r .global.pattern values-global.yaml))
-	@if [ $(NAME) != $(GLOBAL_PATTERN) ]; then\
-		echo "";\
-		echo "WARNING: folder directory is \"$(NAME)\" and global.pattern is set to \"$(GLOBAL_PATTERN)\"";\
-		echo "this can create problems. Please make sure they are the same!";\
-		echo "";\
-	fi
-	@if [ ! -f /run/.containerenv ]; then\
-	  echo "Checking prerequisites:";\
-	  echo -n "  Check for python-kubernetes: ";\
-	  if ! ansible -m ansible.builtin.command -a "{{ ansible_python_interpreter }} -c 'import kubernetes'" localhost > /dev/null 2>&1; then echo "Not found"; exit 1; fi;\
-	  echo "OK";\
-	  echo -n "  Check for kubernetes.core collection: ";\
-	  if ! ansible-galaxy collection list | grep kubernetes.core > /dev/null 2>&1; then echo "Not found"; exit 1; fi;\
-	  echo "OK";\
-	else\
-		if [ -f values-global.yaml ]; then\
-			OUT=`yq -r '.main.multiSourceConfig.enabled // (.main.multiSourceConfig.enabled = "false")' values-global.yaml`;\
-			if [ "$${OUT,,}" = "false" ]; then\
-				echo "You must set \".main.multiSourceConfig.enabled: true\" in your 'values-global.yaml' file";\
-				echo "because your common subfolder is the slimmed down version with no helm charts in it";\
-				exit 1;\
-			fi;\
-		fi;\
-	fi
+	@$(ANSIBLE_RUN) rhvp.cluster_utils.validate_prereq
 
 .PHONY: argo-healthcheck
 argo-healthcheck: ## Checks if all argo applications are synced
