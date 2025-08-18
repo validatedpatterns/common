@@ -81,33 +81,11 @@ argo-healthcheck: ## Checks if all argo applications are synced
 
 .PHONY: qe-tests
 qe-tests: ## Runs the tests that QE runs
-	@set -e; if [ -f ./tests/interop/run_tests.sh ]; then \
-		pushd ./tests/interop; ./run_tests.sh; popd; \
-	else \
-		echo "No ./tests/interop/run_tests.sh found skipping"; \
-	fi
+	@$(ANSIBLE_RUN) rhvp.cluster_utils.qe_tests
 
 .PHONY: super-linter
 super-linter: ## Runs super linter locally
-	rm -rf .mypy_cache
-	podman run -e RUN_LOCAL=true -e USE_FIND_ALGORITHM=true	\
-					-e VALIDATE_ANSIBLE=false \
-					-e VALIDATE_BASH=false \
-					-e VALIDATE_CHECKOV=false \
-					-e VALIDATE_DOCKERFILE_HADOLINT=false \
-					-e VALIDATE_JSCPD=false \
-					-e VALIDATE_JSON_PRETTIER=false \
-					-e VALIDATE_MARKDOWN_PRETTIER=false \
-					-e VALIDATE_KUBERNETES_KUBECONFORM=false \
-					-e VALIDATE_PYTHON_PYLINT=false \
-					-e VALIDATE_SHELL_SHFMT=false \
-					-e VALIDATE_TEKTON=false \
-					-e VALIDATE_YAML=false \
-					-e VALIDATE_YAML_PRETTIER=false \
-					$(DISABLE_LINTERS) \
-					-v $(PWD):/tmp/lint:rw,z \
-					-w /tmp/lint \
-					ghcr.io/super-linter/super-linter:slim-v7
+	@$(ANSIBLE_RUN) rhvp.cluster_utils.super_linter
 
 .PHONY: deploy upgrade legacy-deploy legacy-upgrade
 deploy upgrade legacy-deploy legacy-upgrade:
