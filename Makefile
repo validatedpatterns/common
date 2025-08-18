@@ -47,16 +47,11 @@ secrets-backend-none: ## Edits values files to remove secrets manager + ESO
 
 .PHONY: load-iib
 load-iib: ## CI target to install Index Image Bundles
-	@set -e; if [ x$(INDEX_IMAGES) != x ]; then \
-		ansible-playbook $(EXTRA_PLAYBOOK_OPTS) rhvp.cluster_utils.iib_ci; \
-	else \
-		echo "No INDEX_IMAGES defined. Bailing out"; \
-		exit 1; \
-	fi
+	@$(ANSIBLE_RUN) rhvp.cluster_utils.iib_ci
 
 .PHONY: token-kubeconfig
 token-kubeconfig: ## Create a local ~/.kube/config with password (not usually needed)
-	common/scripts/write-token-kubeconfig.sh
+	@$(ANSIBLE_RUN) rhvp.cluster_utils.write_token_kubeconfig
 
 ##@ Validation Tasks
 
