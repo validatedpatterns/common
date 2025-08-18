@@ -67,10 +67,7 @@ validate-cluster: ## Do some cluster validations before installing
 
 .PHONY: validate-schema
 validate-schema: ## validates values files against schema in common/clustergroup
-	$(eval VAL_PARAMS := $(shell for i in ./values-*.yaml; do echo -n "$${i} "; done))
-	@echo -n "Validating clustergroup schema of: "
-	@set -e; for i in $(VAL_PARAMS); do echo -n " $$i"; helm template oci://quay.io/hybridcloudpatterns/clustergroup $(HELM_OPTS) -f "$${i}" >/dev/null; done
-	@echo
+	@$(ANSIBLE_RUN) rhvp.cluster_utils.validate_schema
 
 .PHONY: validate-prereq
 validate-prereq: ## verify pre-requisites
