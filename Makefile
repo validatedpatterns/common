@@ -1,6 +1,6 @@
 MAKEFLAGS += --no-print-directory
-# ANSIBLE_RUN = ansible-playbook $(EXTRA_PLAYBOOK_OPTS) -vvv
-ANSIBLE_RUN = ANSIBLE_STDOUT_CALLBACK=null ansible-playbook $(EXTRA_PLAYBOOK_OPTS)
+ANSIBLE_RUN = ansible-playbook $(EXTRA_PLAYBOOK_OPTS) -vvv
+# ANSIBLE_RUN = ANSIBLE_STDOUT_CALLBACK=null ansible-playbook $(EXTRA_PLAYBOOK_OPTS)
 
 ##@ Pattern Common Tasks
 
@@ -22,18 +22,12 @@ preview-%:
 	@$(ANSIBLE_RUN) -e app=$* rhvp.cluster_utils.preview
 
 .PHONY: operator-deploy
-operator-deploy operator-upgrade: validate-prereq validate-origin validate-cluster ## runs helm install
-	@common/scripts/deploy-pattern.sh $(NAME) $(PATTERN_INSTALL_CHART) $(HELM_OPTS)
-
-# .PHONY: uninstall
-# uninstall: ## runs helm uninstall
-# 	$(eval CSV := $(shell oc get subscriptions -n openshift-operators openshift-gitops-operator -ojsonpath={.status.currentCSV}))
-# 	helm uninstall $(NAME)
-# 	@oc delete csv -n openshift-operators $(CSV)
+operator-deploy operator-upgrade: ## validates the pattern repo and installs via the pattern-install chart
+	@$(ANSIBLE_RUN) rhvp.cluster_utils.operator_deploy
 
 .PHONY: load-secrets
 load-secrets: ## loads the secrets into the backend determined by values-global setting
-	common/scripts/process-secrets.sh $(NAME)
+	@$(ANSIBLE_RUN) rhvp.cluster_utils.process_secrets
 
 .PHONY: legacy-load-secrets
 legacy-load-secrets: ## loads the secrets into vault (only)
@@ -86,16 +80,7 @@ validate-origin: ## verify the git origin is available
 
 .PHONY: validate-cluster
 validate-cluster: ## Do some cluster validations before installing
-	@echo "Checking cluster:"
-	@echo -n "  cluster-info: "
-	@oc cluster-info >/dev/null && echo "OK" || (echo "Error"; exit 1)
-	@echo -n "  storageclass: "
-	@if [ `oc get storageclass -o go-template='{{printf "%d\n" (len .items)}}'` -eq 0 ]; then\
-		echo "WARNING: No storageclass found";\
-	else\
-		echo "OK";\
-	fi
-
+	@$(ANSIBLE_RUN) rhvp.cluster_utils.validate_cluster
 
 .PHONY: validate-schema
 validate-schema: ## validates values files against schema in common/clustergroup
@@ -130,7 +115,6 @@ argo-healthcheck: ## Checks if all argo applications are synced
 	    echo "Some applications are not synced or are unhealthy";\
 	    exit 1;\
 	fi
-
 
 ##@ Test and Linters Tasks
 
