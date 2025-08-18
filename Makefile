@@ -75,26 +75,7 @@ validate-prereq: ## verify pre-requisites
 
 .PHONY: argo-healthcheck
 argo-healthcheck: ## Checks if all argo applications are synced
-	@echo "Checking argo applications"
-	$(eval APPS := $(shell oc get applications.argoproj.io -A -o jsonpath='{range .items[*]}{@.metadata.namespace}{","}{@.metadata.name}{"\n"}{end}'))
-	@NOTOK=0; \
-	for i in $(APPS); do\
-		n=`echo "$${i}" | cut -f1 -d,`;\
-		a=`echo "$${i}" | cut -f2 -d,`;\
-		STATUS=`oc get -n "$${n}" applications.argoproj.io/"$${a}" -o jsonpath='{.status.sync.status}'`;\
-		if [[ $$STATUS != "Synced" ]]; then\
-			NOTOK=$$(( $${NOTOK} + 1));\
-		fi;\
-		HEALTH=`oc get -n "$${n}" applications.argoproj.io/"$${a}" -o jsonpath='{.status.health.status}'`;\
-		if [[ $$HEALTH != "Healthy" ]]; then\
-			NOTOK=$$(( $${NOTOK} + 1));\
-		fi;\
-		echo "$${n} $${a} -> Sync: $${STATUS} - Health: $${HEALTH}";\
-	done;\
-	if [ $${NOTOK} -gt 0 ]; then\
-	    echo "Some applications are not synced or are unhealthy";\
-	    exit 1;\
-	fi
+	@$(ANSIBLE_RUN) rhvp.cluster_utils.argo_healthcheck
 
 ##@ Test and Linters Tasks
 
