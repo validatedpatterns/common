@@ -21,16 +21,8 @@ preview-all: ## (EXPERIMENTAL) Previews all applications on hub and managed clus
 preview-%:
 	@$(ANSIBLE_RUN) -e app=$* rhvp.cluster_utils.preview
 
-# Set this to true if you want to skip any origin validation
-DISABLE_VALIDATE_ORIGIN ?= false
-ifeq ($(DISABLE_VALIDATE_ORIGIN),true)
-  VALIDATE_ORIGIN :=
-else
-  VALIDATE_ORIGIN := validate-origin
-endif
-
 .PHONY: operator-deploy
-operator-deploy operator-upgrade: validate-prereq $(VALIDATE_ORIGIN) validate-cluster ## runs helm install
+operator-deploy operator-upgrade: validate-prereq validate-origin validate-cluster ## runs helm install
 	@common/scripts/deploy-pattern.sh $(NAME) $(PATTERN_INSTALL_CHART) $(HELM_OPTS)
 
 # .PHONY: uninstall
@@ -90,18 +82,7 @@ token-kubeconfig: ## Create a local ~/.kube/config with password (not usually ne
 # that and not target_repo
 .PHONY: validate-origin
 validate-origin: ## verify the git origin is available
-	@echo "Checking repository:"
-	$(eval UPSTREAMURL := $(shell yq -r '.main.git.repoUpstreamURL // (.main.git.repoUpstreamURL = "")' values-global.yaml))
-	@if [ -z "$(UPSTREAMURL)" ]; then\
-		echo -n "  $(TARGET_REPO) - branch '$(TARGET_BRANCH)': ";\
-		git ls-remote --exit-code --heads $(TARGET_REPO) $(TARGET_BRANCH) >/dev/null &&\
-			echo "OK" || (echo "NOT FOUND"; exit 1);\
-	else\
-		echo "Upstream URL set to: $(UPSTREAMURL)";\
-		echo -n "  $(UPSTREAMURL) - branch '$(TARGET_BRANCH)': ";\
-		git ls-remote --exit-code --heads $(UPSTREAMURL) $(TARGET_BRANCH) >/dev/null &&\
-			echo "OK" || (echo "NOT FOUND"; exit 1);\
-	fi
+	@$(ANSIBLE_RUN) rhvp.cluster_utils.validate_origin
 
 .PHONY: validate-cluster
 validate-cluster: ## Do some cluster validations before installing
