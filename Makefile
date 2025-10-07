@@ -1,4 +1,4 @@
-NAME ?= $(shell basename "`pwd`")
+NAME ?= $(shell yq .global.pattern values-global.yaml)
 
 ifneq ($(origin TARGET_SITE), undefined)
   TARGET_SITE_OPT=--set main.clusterGroupName=$(TARGET_SITE)
@@ -189,13 +189,7 @@ validate-schema: ## validates values files against schema in common/clustergroup
 
 .PHONY: validate-prereq
 validate-prereq: ## verify pre-requisites
-	$(eval GLOBAL_PATTERN := $(shell yq -r .global.pattern values-global.yaml))
-	@if [ $(NAME) != $(GLOBAL_PATTERN) ]; then\
-		echo "";\
-		echo "WARNING: folder directory is \"$(NAME)\" and global.pattern is set to \"$(GLOBAL_PATTERN)\"";\
-		echo "this can create problems. Please make sure they are the same!";\
-		echo "";\
-	fi
+	@common/scripts/validate-names-length.sh
 	@if [ ! -f /run/.containerenv ]; then\
 	  echo "Checking prerequisites:";\
 	  echo -n "  Check for python-kubernetes: ";\
