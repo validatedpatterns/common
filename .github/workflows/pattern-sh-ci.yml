@@ -18,7 +18,7 @@ jobs:
     strategy:
       matrix:
         # Fedora is not an option yet
-        os: [ubuntu-latest, ubuntu-22.04]
+        os: [ubuntu-latest, ubuntu-22.04, ubuntu-24.04-arm]
     runs-on: ${{ matrix.os }}
     permissions:
       contents: read
