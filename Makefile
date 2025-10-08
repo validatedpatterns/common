@@ -1,5 +1,12 @@
 NAME ?= $(shell yq .global.pattern values-global.yaml)
 
+ifeq ($(NAME),)
+$(error Pattern name MUST be set in values-global.yaml with the value .global.pattern)
+endif
+ifeq ($(NAME),null)
+$(error Pattern name MUST be set in values-global.yaml with the value .global.pattern)
+endif
+
 ifneq ($(origin TARGET_SITE), undefined)
   TARGET_SITE_OPT=--set main.clusterGroupName=$(TARGET_SITE)
 endif
