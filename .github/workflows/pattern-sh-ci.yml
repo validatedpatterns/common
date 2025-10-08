@@ -29,12 +29,6 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Install Podman on Ubuntu
-        if: contains(matrix.os, 'ubuntu')
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y podman
-
       # Currently we do not do MacOSX as it is not free, maybe in the future
       # - name: Install Podman on macOS
       #   if: contains(matrix.os, 'macos')
@@ -46,7 +40,14 @@ jobs:
       - name: Verify Podman Installation
         run: podman --version
 
+      - name: Clone MCG and update common
+        run: |
+          git clone --depth 1 https://github.com/hybrid-cloud-patterns/multicloud-gitops mcg
+          cp -r scripts/ mcg/common/scripts
+          cp Makefile mcg/common
+
       - name: Run pattern.sh script
         run: |
-          export TARGET_BRANCH=main
-          ./scripts/pattern-util.sh make validate-origin
+          cd mcg
+          ./pattern.sh make validate-origin
+          ./pattern.sh make show
