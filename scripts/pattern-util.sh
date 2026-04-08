@@ -22,6 +22,27 @@ if [ -n "${PATTERN_DISCONNECTED_HOME}" ]; then
     echo "  PATTERN_INSTALL_CHART: ${PATTERN_INSTALL_CHART}"
 fi
 
+function is_running_in_container {
+    # Check if we're running inside a podman container
+    # Podman creates /run/.containerenv in all containers (rootful and rootless)
+    if [ -f /run/.containerenv ]; then
+        return 0
+    fi
+    # Use systemd-detect-virt if available to detect container environment
+    if command -v systemd-detect-virt >/dev/null 2>&1; then
+        if systemd-detect-virt --container >/dev/null 2>&1; then
+            return 0
+        fi
+    fi
+    return 1
+}
+
+# If already running in a container, execute the command directly
+if is_running_in_container; then
+    echo "Detected running inside a container, executing command directly..."
+    exec "$@"
+fi
+
 readonly commands=(podman)
 for cmd in ${commands[@]}; do is_available "$cmd"; done
 
