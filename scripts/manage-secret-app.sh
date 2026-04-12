@@ -41,7 +41,7 @@ case "$STATE" in
     ;;
     "absent")
         common/scripts/manage-secret-namespace.sh "$NAMESPACE" "$STATE"
-        echo "Removing application wth chart location $CHART_LOCATION"
+        echo "Removing application with chart location $CHART_LOCATION"
         yq -i "del(.clusterGroup.applications[] | select(.chart == \"$CHART_NAME\"))" "$MAIN_CLUSTERGROUP_FILE"
     ;;
     *)
