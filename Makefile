@@ -69,6 +69,7 @@ else
 endif
 
 HELM_OPTS := -f values-global.yaml \
+             --set main.patternsOperator.subscriptionNamespace=patterns-operator \
              --set main.git.repoURL="$(TARGET_REPO)" \
              --set main.git.revision=$(TARGET_BRANCH) \
              $(SECRET_OPTS) \
